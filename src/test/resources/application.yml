@@ -1,0 +1,34 @@
+openapi:
+  project-title: MyPIL
+  project-version: v1
+  project-description: User registration module
+server:
+  port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  info:
+    env:
+      enabled: true
+spring:
+  datasource:
+    initialization-mode: always
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        ddl-auto: create
+  sql:
+    init:
+      mode: always
+  hikari:
+    minimumIdle: 5
+    maximumPoolSize: 100
+    idleTimeout: 600000
+    maxLifetime: 1800000
+    connectionTimeout: 300000
+    leakDetectionThreshold: 300000

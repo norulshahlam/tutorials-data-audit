@@ -1,0 +1,110 @@
+package com.example.userregistration.controller;
+
+import com.example.userregistration.entity.BookingEntity;
+import com.example.userregistration.entity.ContactEntity;
+import com.example.userregistration.service.BookingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+
+
+@RestController
+@Slf4j
+@RequiredArgsConstructor
+@RequestMapping("api/v1")
+@Tag(name = "Booking module")
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "400", description = "Bad Request",
+                content = @Content),
+        @ApiResponse(responseCode = "401", description = "Unauthorized Access",
+                content = @Content),
+        @ApiResponse(responseCode = "403", description = "Forbidden",
+                content = @Content),
+        @ApiResponse(responseCode = "404", description = "The server has not found anything matching the URI given",
+                content = @Content),
+        @ApiResponse(responseCode = "405", description = "Method not Allowed",
+                content = @Content),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                content = @Content),
+        @ApiResponse(responseCode = "503", description = "Service Unavailable",
+                content = @Content)})
+public class BookingController {
+
+    private final BookingService service;
+
+    @ApiResponse(responseCode = "200", description = "Booking created",
+            content = @Content(mediaType = "application/json"))
+    @Operation(summary = "Create new booking",
+            description = "This endpoint will Create new booking based on the given input data")
+    @PostMapping("createBooking")
+    public ResponseEntity<BookingEntity> createBooking(@Valid @RequestBody @NotBlank BookingEntity request) {
+
+        log.info("in RegistrationController::createBooking");
+        BookingEntity booking = service.createBooking(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(booking);
+    }
+    @ApiResponse(responseCode = "200", description = "Booking fetched",
+            content = @Content(mediaType = "application/json"))
+    @Operation(summary = "Fetch booking",
+            description = "This endpoint will Fetch booking based on id")
+    @GetMapping("fetchBooking/{id}")
+    public ResponseEntity<BookingEntity> fetchBooking(@PathVariable Long id) {
+
+        log.info("in RegistrationController::fetchBooking");
+        BookingEntity booking = service.fetchBooking(id);
+        return ResponseEntity.status(HttpStatus.OK).body(booking);
+    }
+
+    @ApiResponse(responseCode = "200", description = "Booking edited",
+            content = @Content(mediaType = "application/json"))
+    @Operation(summary = "Edit existing user",
+            description = "This endpoint will edit existing booking")
+    @PostMapping("editBooking")
+    public ResponseEntity<BookingEntity> editBooking(@Valid @RequestBody @NotBlank BookingEntity request) {
+        log.info("in RegistrationController::editBooking");
+        BookingEntity booking = service.editBooking(request);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(booking);
+    }
+
+    @ApiResponse(responseCode = "200", description = "Booking deleted",
+            content = @Content(mediaType = "application/json"))
+    @Operation(summary = "Delete existing booking",
+            description = "This endpoint will delete existing booking")
+    @DeleteMapping("deleteBooking/{id}")
+    public ResponseEntity<String> deleteBooking(@PathVariable Long id) {
+        log.info("in RegistrationController::deleteBooking");
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.deleteBooking(id));
+    }
+
+    @ApiResponse(responseCode = "200", description = "Contact deleted",
+            content = @Content(mediaType = "application/json"))
+    @Operation(summary = "Delete existing Contact",
+            description = "This endpoint will delete existing contact")
+    @DeleteMapping("deleteContact/{id}")
+    public ResponseEntity<String> deleteContact(@PathVariable Long id) {
+        log.info("in RegistrationController::deleteContact");
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.deleteContact(id));
+    }
+    @ApiResponse(responseCode = "200", description = "Contact Edited",
+            content = @Content(mediaType = "application/json"))
+    @Operation(summary = "Edit existing contact",
+            description = "This endpoint will Edit existing contact")
+    @PostMapping("editContact")
+    public ResponseEntity<ContactEntity> editContact(@Valid @RequestBody @NotBlank ContactEntity request) {
+        log.info("in RegistrationController::editContact");
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.editContact(request));
+    }
+}
