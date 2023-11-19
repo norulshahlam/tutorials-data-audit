@@ -240,7 +240,7 @@ public class BookingEntity implements Serializable {
     @Column(name = "DOCUMENTATION_CUTOFF_DATE")
     private Date documentationCutoffDate;
     @Builder.Default
-    @OneToMany(mappedBy = "bookingEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "bookingEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<ContractEntity> contracts = new ArrayList<>();
 
     @Builder.Default

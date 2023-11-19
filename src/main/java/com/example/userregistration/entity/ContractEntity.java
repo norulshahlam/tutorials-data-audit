@@ -59,7 +59,7 @@ public class ContractEntity extends AuditEntity implements Serializable {
             requiredMode = Schema.RequiredMode.REQUIRED)
     private String status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "BOOKING_ID")
     @JsonIgnore
     private BookingEntity bookingEntity;
