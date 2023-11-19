@@ -1,7 +1,7 @@
 package com.example.userregistration.entity;
 
 import lombok.*;
-import org.hibernate.envers.Audited;
+
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @Entity
-@Audited
+
 @Table(name = "VESSEL_VOYAGE")
 public class VesselVoyageEntity extends AuditEntity implements Serializable {
 

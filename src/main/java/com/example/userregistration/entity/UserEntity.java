@@ -3,7 +3,6 @@ package com.example.userregistration.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.hibernate.envers.Audited;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,7 +12,7 @@ import javax.validation.constraints.Email;
  * @author norulshahlam.mohsen
  */
 @Entity
-@Audited
+
 @Data
 public class UserEntity {
 

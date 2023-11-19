@@ -88,7 +88,7 @@ class UserEntityApplicationTests {
     }
 
     @RepeatedTest(10)
-    @DisplayName("Edit Booking using java object")
+    @DisplayName("Edit Contact using java object")
     void editBooking() {
         List<ContactEntity> all = contactRepository.findAll();
         ContactEntity contactEntity = all.get(0);

@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
-@Audited
+
 @Data
 @Table(name = "BOOKING")
 @JsonIgnoreProperties

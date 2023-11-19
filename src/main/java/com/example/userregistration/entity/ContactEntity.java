@@ -2,8 +2,10 @@ package com.example.userregistration.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import org.hibernate.envers.Audited;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,7 +14,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 @Entity
-@Audited
+
 @Data
 @Table(name = "CONTACT")
 public class ContactEntity extends AuditEntity implements Serializable {
