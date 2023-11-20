@@ -33,6 +33,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public BookingEntity fetchBooking(Long id) {
+        Optional<BookingEntity> byId = bookingRepository.findById(id);
+
+        if (byId.isPresent()) {
+            return byId.get();
+        }
+        throw new NoResultException("Booking to be fetched not found");
+    }
+
+    @Override
     public BookingEntity editBooking(BookingEntity booking) {
 
         Optional<BookingEntity> result = bookingRepository.findById(booking.getId());
@@ -41,7 +51,8 @@ public class BookingServiceImpl implements BookingService {
             log.info("in BookingServiceImpl::editBooking");
             BookingEntity bookingEntity = result.get();
             log.info("bookingEntity: " + bookingEntity);
-            bookingEntity.setBkgRqstNo(booking.getBkgRqstNo());
+            bookingEntity.setBkgNo(booking.getBkgNo());
+            bookingEntity.setBkgRqstStatusSeq(booking.getBkgRqstStatusSeq());
             BookingEntity saved = bookingRepository.save(bookingEntity);
             log.info("saved: " + saved);
             return saved;
@@ -62,6 +73,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public ContactEntity createContact(ContactEntity request) {
+        log.info("in BookingServiceImpl::createContact");
+        return contactRepository.save(request);
+    }
+
+    @Override
     public String deleteContact(Long id) {
         Optional<ContactEntity> result = contactRepository.findById(id);
 
@@ -74,7 +91,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
 
-    /** Change only name and mobileNo
+    /**
+     * Change only name and mobileNo
+     *
      * @param contact
      * @return
      */
@@ -93,13 +112,5 @@ public class BookingServiceImpl implements BookingService {
         throw new NoResultException("Contact to be edited not found");
     }
 
-    @Override
-    public BookingEntity fetchBooking(Long id) {
-        Optional<BookingEntity> byId = bookingRepository.findById(id);
 
-        if (byId.isPresent()) {
-            return byId.get();
-        }
-        throw new NoResultException("Booking to be fetched not found");
-    }
 }
