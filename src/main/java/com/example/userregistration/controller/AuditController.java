@@ -58,7 +58,7 @@ public class AuditController {
         return jsonConverter.toJson(changes);
     }
 
-    @GetMapping("/contact/snapshots")
+    @GetMapping("/booking/snapshots")
     public String getBookingEntitySnapshots() {
         QueryBuilder jqlQuery = QueryBuilder.byClass(BookingEntity.class);
 
