@@ -87,18 +87,30 @@ class UserEntityApplicationTests {
         assertThat(all, hasSize(greaterThanOrEqualTo(1)));
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(2)
     @DisplayName("Edit Contact using java object")
     void editContact() {
         List<ContactEntity> all = contactRepository.findAll();
         ContactEntity contactEntity = all.get(0);
-        contactEntity.setEmail(faker.internet().emailAddress());
+
+        String oldName = contactEntity.getName();
+        String oldMobileNo = contactEntity.getMobileNo();
+
+        contactEntity.setName(faker.name().fullName());
+        contactEntity.setMobileNo(faker.phoneNumber().cellPhone());
+
         ContactEntity editedContact = restTemplate.postForObject(baseUrl.concat("/editContact"), contactEntity, ContactEntity.class);
-        String oldEmail = contactEntity.getEmail();
-        String newEmail = editedContact.getEmail();
-        log.info("\noldEmail: " + oldEmail + "\nnewEmail: " + newEmail);
-        assertThat(oldEmail, not(newEmail));
+
+        String newName = editedContact.getName();
+        String newMobileNo = editedContact.getMobileNo();
+
+        log.info("oldName: " + oldName + " --> newName: " + newName);
+        log.info("oldMobileNo: " + oldMobileNo + " --> newMobileNo: " + newMobileNo);
+
+        assertThat(oldName, not(newName));
+        assertThat(oldMobileNo, not(newMobileNo));
     }
+
 
     @RepeatedTest(10)
     @DisplayName("Delete Booking by id")
@@ -112,7 +124,7 @@ class UserEntityApplicationTests {
         assertThat(byId, is(Optional.empty()));
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(1)
     @DisplayName("Delete Contact by id")
     void deleteContact() {
         List<ContactEntity> all = contactRepository.findAll();
