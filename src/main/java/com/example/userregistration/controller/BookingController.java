@@ -49,7 +49,7 @@ public class BookingController {
     @PostMapping("createBooking")
     public ResponseEntity<BookingEntity> createBooking(@Valid @RequestBody @NotBlank BookingEntity request) {
 
-        log.info("in RegistrationController::createBooking");
+        log.info("in BookingController::createBooking");
         BookingEntity booking = service.createBooking(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(booking);
     }
@@ -60,7 +60,7 @@ public class BookingController {
     @GetMapping("fetchBooking/{id}")
     public ResponseEntity<BookingEntity> fetchBooking(@PathVariable Long id) {
 
-        log.info("in RegistrationController::fetchBooking");
+        log.info("in BookingController::fetchBooking");
         BookingEntity booking = service.fetchBooking(id);
         return ResponseEntity.status(HttpStatus.OK).body(booking);
     }
@@ -71,7 +71,7 @@ public class BookingController {
             description = "This endpoint will edit existing booking")
     @PostMapping("editBooking")
     public ResponseEntity<BookingEntity> editBooking(@Valid @RequestBody @NotBlank BookingEntity request) {
-        log.info("in RegistrationController::editBooking");
+        log.info("in BookingController::editBooking");
         BookingEntity booking = service.editBooking(request);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(booking);
     }
@@ -82,9 +82,21 @@ public class BookingController {
             description = "This endpoint will delete existing booking")
     @DeleteMapping("deleteBooking/{id}")
     public ResponseEntity<String> deleteBooking(@PathVariable Long id) {
-        log.info("in RegistrationController::deleteBooking");
+        log.info("in BookingController::deleteBooking");
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.deleteBooking(id));
+    }
+
+    @ApiResponse(responseCode = "200", description = "contact created",
+            content = @Content(mediaType = "application/json"))
+    @Operation(summary = "Create new contact",
+            description = "This endpoint will Create new contact based on the given input data")
+    @PostMapping("createContact")
+    public ResponseEntity<ContactEntity> createContact(@Valid @RequestBody @NotBlank ContactEntity request) {
+
+        log.info("in BookingController::createContact");
+        ContactEntity booking = service.createContact(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(booking);
     }
 
     @ApiResponse(responseCode = "200", description = "Contact deleted",
@@ -93,7 +105,7 @@ public class BookingController {
             description = "This endpoint will delete existing contact")
     @DeleteMapping("deleteContact/{id}")
     public ResponseEntity<String> deleteContact(@PathVariable Long id) {
-        log.info("in RegistrationController::deleteContact");
+        log.info("in BookingController::deleteContact");
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.deleteContact(id));
     }
@@ -103,7 +115,7 @@ public class BookingController {
             description = "This endpoint will Edit existing contact")
     @PostMapping("editContact")
     public ResponseEntity<ContactEntity> editContact(@Valid @RequestBody @NotBlank ContactEntity request) {
-        log.info("in RegistrationController::editContact");
+        log.info("in BookingController::editContact");
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.editContact(request));
     }

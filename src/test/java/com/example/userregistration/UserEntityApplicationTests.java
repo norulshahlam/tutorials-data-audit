@@ -41,8 +41,8 @@ class UserEntityApplicationTests {
     private ContactRepository contactRepository;
     private String baseUrl = "http://localhost:";
     BookingEntity bookingEntity = new BookingEntity();
-    List<ContactEntity> contactEntity = new ArrayList<>();
-    List<ContractEntity> contractEntity = new ArrayList<>();
+
+    ContactEntity contactEntity = new ContactEntity();
 
     @BeforeAll
     static void beforeAll() {
@@ -61,6 +61,8 @@ class UserEntityApplicationTests {
         bookingEntity.setDangerousGoods(List.of(initDangerousGoodsData()));
         bookingEntity.setVesselVoyages(List.of(initVesselVoyageData()));
         bookingEntity.setRefeerCargos(List.of(initRefeerCargoData()));
+
+        contactEntity = initContactData();
     }
 
     Faker faker = new Faker();
@@ -77,7 +79,7 @@ class UserEntityApplicationTests {
     }
 
     @Test
-    @Order(1)
+    @Order(10)
     @DisplayName("Create booking using json")
     void createBookingUsingJson() throws Exception {
         File file = new File("src/test/resources/bookingDto.json");
@@ -87,7 +89,18 @@ class UserEntityApplicationTests {
         assertThat(all, hasSize(greaterThanOrEqualTo(1)));
     }
 
-    @RepeatedTest(2)
+    @RepeatedTest(10)
+    @Order(1)
+    @DisplayName("Create Contact using java object")
+    void createContact() throws JsonProcessingException {
+        /* Copy this log data to create json file */
+        log.info("ContactEntity: " + objectMapper.writeValueAsString(contactEntity));
+        restTemplate.postForObject(baseUrl.concat("/createContact"), contactEntity, ContactEntity.class);
+        List<ContactEntity> all = contactRepository.findAll();
+        assertThat(all, hasSize(greaterThanOrEqualTo(1)));
+    }
+
+    @RepeatedTest(10)
     @DisplayName("Edit booking using java object")
     void editBooking() {
         List<BookingEntity> all = bookingRepository.findAll();
@@ -110,12 +123,13 @@ class UserEntityApplicationTests {
         assertThat(oldBkgNo, not(newBkgNo));
         assertThat(oldBkgRqstStatusSeq, not(newBkgRqstStatusSeq));
     }
- @RepeatedTest(2)
-    @DisplayName("Edit Contact using java object")
-    void editContact() {
-        List<ContactEntity> all = contactRepository.findAll();
-        ContactEntity contactEntity = all.get(0);
 
+    @RepeatedTest(10)
+    @DisplayName("Edit Contact using java object")
+    void editContact() throws JsonProcessingException {
+        List<ContactEntity> contactEntities = contactRepository.findAll();
+        ContactEntity contactEntity = contactEntities.get(0);
+        log.info("bookingEntity: " + objectMapper.writeValueAsString(contactEntities));
         String oldName = contactEntity.getName();
         String oldMobileNo = contactEntity.getMobileNo();
 
@@ -134,7 +148,6 @@ class UserEntityApplicationTests {
         assertThat(oldMobileNo, not(newMobileNo));
     }
 
-
     @RepeatedTest(10)
     @DisplayName("Delete Booking by id")
     void deleteBooking() {
@@ -147,7 +160,7 @@ class UserEntityApplicationTests {
         assertThat(byId, is(Optional.empty()));
     }
 
-    @RepeatedTest(1)
+    @RepeatedTest(10)
     @DisplayName("Delete Contact by id")
     void deleteContact() {
         List<ContactEntity> all = contactRepository.findAll();
