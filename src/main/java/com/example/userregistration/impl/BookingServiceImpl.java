@@ -41,7 +41,8 @@ public class BookingServiceImpl implements BookingService {
             log.info("in BookingServiceImpl::editBooking");
             BookingEntity bookingEntity = result.get();
             log.info("bookingEntity: " + bookingEntity);
-            bookingEntity.setBkgRqstNo(booking.getBkgRqstNo());
+            bookingEntity.setBkgNo(booking.getBkgNo());
+            bookingEntity.setBkgRqstStatusSeq(booking.getBkgRqstStatusSeq());
             BookingEntity saved = bookingRepository.save(bookingEntity);
             log.info("saved: " + saved);
             return saved;

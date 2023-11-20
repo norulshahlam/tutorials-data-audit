@@ -88,6 +88,29 @@ class UserEntityApplicationTests {
     }
 
     @RepeatedTest(2)
+    @DisplayName("Edit booking using java object")
+    void editBooking() {
+        List<BookingEntity> all = bookingRepository.findAll();
+        BookingEntity bookingEntity = all.get(0);
+
+        String oldBkgNo = bookingEntity.getBkgNo();
+        String oldBkgRqstStatusSeq = bookingEntity.getBlNo();
+
+        bookingEntity.setBkgNo(faker.idNumber().ssnValid());
+        bookingEntity.setBkgRqstStatusSeq(new Random().nextInt());
+
+        BookingEntity editedBooking = restTemplate.postForObject(baseUrl.concat("/editBooking"), bookingEntity, BookingEntity.class);
+
+        String newBkgNo = editedBooking.getBkgNo();
+        Integer newBkgRqstStatusSeq = editedBooking.getBkgRqstStatusSeq();
+
+        log.info("oldBkgNo: " + oldBkgNo + " --> newBkgNo: " + newBkgNo);
+        log.info("oldBkgRqstStatusSeq: " + oldBkgRqstStatusSeq + " --> newBkgRqstStatusSeq: " + newBkgRqstStatusSeq);
+
+        assertThat(oldBkgNo, not(newBkgNo));
+        assertThat(oldBkgRqstStatusSeq, not(newBkgRqstStatusSeq));
+    }
+ @RepeatedTest(2)
     @DisplayName("Edit Contact using java object")
     void editContact() {
         List<ContactEntity> all = contactRepository.findAll();
