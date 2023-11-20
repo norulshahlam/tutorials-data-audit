@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 reference-service-log/
 user-service-log/
+booking-validation-service-log/
 
 ### STS ###
 .apt_generated
