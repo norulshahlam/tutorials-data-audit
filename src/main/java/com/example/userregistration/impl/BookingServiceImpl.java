@@ -74,6 +74,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
 
+    /** Change only name and mobileNo
+     * @param contact
+     * @return
+     */
     @Override
     public ContactEntity editContact(ContactEntity contact) {
         Optional<ContactEntity> result = contactRepository.findById(contact.getId());
