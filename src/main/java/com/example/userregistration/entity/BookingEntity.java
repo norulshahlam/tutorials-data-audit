@@ -1,6 +1,5 @@
 package com.example.userregistration.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,14 +24,13 @@ import java.util.List;
 @Audited
 @Data
 @Table(name = "BOOKING")
-@JsonIgnoreProperties
 public class BookingEntity implements Serializable {
 
     public static final long serialVersionId = 1L;
 
     @Id
     @Column(name = "ID", nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Schema(
@@ -240,7 +238,7 @@ public class BookingEntity implements Serializable {
     @Column(name = "DOCUMENTATION_CUTOFF_DATE")
     private Date documentationCutoffDate;
     @Builder.Default
-    @OneToMany(mappedBy = "bookingEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "bookingEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ContractEntity> contracts = new ArrayList<>();
 
     @Builder.Default
