@@ -1,6 +1,5 @@
 package com.example.userregistration.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,14 +23,13 @@ import java.util.List;
 
 @Data
 @Table(name = "BOOKING")
-@JsonIgnoreProperties
 public class BookingEntity implements Serializable {
 
     public static final long serialVersionId = 1L;
 
     @Id
     @Column(name = "ID", nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Schema(
