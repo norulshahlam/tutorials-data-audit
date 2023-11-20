@@ -89,7 +89,7 @@ class UserEntityApplicationTests {
 
     @RepeatedTest(10)
     @DisplayName("Edit Contact using java object")
-    void editBooking() {
+    void editContact() {
         List<ContactEntity> all = contactRepository.findAll();
         ContactEntity contactEntity = all.get(0);
         contactEntity.setEmail(faker.internet().emailAddress());
