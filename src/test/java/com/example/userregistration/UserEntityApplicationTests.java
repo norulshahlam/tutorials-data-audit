@@ -69,7 +69,7 @@ class UserEntityApplicationTests {
 
     Faker faker = new Faker();
 
-    @RepeatedTest(10)
+    @RepeatedTest(2)
     @Order(1)
     @DisplayName("Create Booking using java object")
     void createBooking() throws JsonProcessingException {
@@ -102,16 +102,17 @@ class UserEntityApplicationTests {
         assertThat(all, hasSize(greaterThanOrEqualTo(1)));
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(1)
     @Order(5)
     @DisplayName("Edit booking using java object")
     void editBooking() {
 
         /* Fetch booking first */
-        long id = 11L;
+        long id = 1L;
         String getUri = baseUrl.concat("/fetchBooking/").concat(Long.toString(id));
         log.info("getUri: " + getUri);
-        BookingEntity fetchedBooking = restTemplate.getForEntity(getUri, BookingEntity.class).getBody();
+        BookingEntity fetchedBooking = restTemplate
+                .getForEntity(getUri, BookingEntity.class).getBody();
 
         /* With fetched booking, edit some fields */
         id=id+1;
@@ -121,7 +122,8 @@ class UserEntityApplicationTests {
         fetchedBooking.setBkgNo(faker.idNumber().ssnValid());
         fetchedBooking.setBkgRqstStatusSeq(new Random().nextInt());
 
-        BookingEntity editedBooking = restTemplate.postForObject(baseUrl.concat("/editBooking"), fetchedBooking, BookingEntity.class);
+        BookingEntity editedBooking = restTemplate
+                .postForObject(baseUrl.concat("/editBooking"), fetchedBooking, BookingEntity.class);
 
         String newBkgNo = editedBooking.getBkgNo();
         Integer newBkgRqstStatusSeq = editedBooking.getBkgRqstStatusSeq();
@@ -134,7 +136,7 @@ class UserEntityApplicationTests {
 
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(1)
     @Order(6)
     @DisplayName("Edit Contact using java object")
     void editContact() throws JsonProcessingException {

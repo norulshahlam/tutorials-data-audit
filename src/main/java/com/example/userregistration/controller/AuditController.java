@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.javers.core.Changes;
 import org.javers.core.Javers;
+import org.javers.core.diff.Change;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
@@ -31,19 +32,33 @@ public class AuditController {
         this.javers = javers;
     }
 
-    @GetMapping("/booking")
-    public ResponseEntity<String> getBookingEntityChanges() {
+    @GetMapping("/bookingPretty")
+    public ResponseEntity<String> getBookingEntityChangesPretty() {
         QueryBuilder jqlQuery = QueryBuilder.byClass(BookingEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
         return ResponseEntity.ok().body("<pre>" + changes.prettyPrint() + "</pre>");
     }
 
-    @GetMapping("/contact")
-    public ResponseEntity<String> getContactEntityChanges() {
+    @GetMapping("/booking")
+    public ResponseEntity<String> getBookingEntityChanges() {
+        QueryBuilder jqlQuery = QueryBuilder.byClass(BookingEntity.class);
+        List<Change> changes = javers.findChanges(jqlQuery.build());
+        return ResponseEntity.ok().body(javers.getJsonConverter().toJson(changes));
+    }
+
+    @GetMapping("/contactPretty")
+    public ResponseEntity<String> getContactEntityChangesPretty() {
         QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
         return ResponseEntity.ok().body("<pre>" + changes.prettyPrint() + "</pre>");
     }
+ @GetMapping("/contact")
+    public ResponseEntity<String> getContactEntityChanges() {
+        QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
+        List<Change> changes = javers.findChanges(jqlQuery.build());
+        return ResponseEntity.ok().body(javers.getJsonConverter().toJson(changes));
+    }
+
 
     @GetMapping("/contact/snapshots")
     public String getContactEntitySnapshots() {

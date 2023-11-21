@@ -19,4 +19,6 @@ public interface BookingService {
     BookingEntity fetchBooking(Long id);
 
     ContactEntity createContact(ContactEntity request);
+
+    ContactEntity fetchContact(Long id);
 }

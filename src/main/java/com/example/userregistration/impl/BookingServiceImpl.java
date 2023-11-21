@@ -8,6 +8,7 @@ import com.example.userregistration.service.BookingService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.NoResultException;
@@ -34,10 +35,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingEntity fetchBooking(Long id) {
-        Optional<BookingEntity> byId = bookingRepository.findById(id);
+        Optional<BookingEntity> bookingEntity = bookingRepository.findById(id);
 
-        if (byId.isPresent()) {
-            return byId.get();
+        if (bookingEntity.isPresent()) {
+            return bookingEntity.get();
         }
         throw new NoResultException("Booking to be fetched not found");
     }
@@ -51,8 +52,10 @@ public class BookingServiceImpl implements BookingService {
             log.info("in BookingServiceImpl::editBooking");
             BookingEntity bookingEntity = result.get();
             log.info("bookingEntity: " + bookingEntity);
-            bookingEntity.setBkgNo(booking.getBkgNo());
-            bookingEntity.setBkgRqstStatusSeq(booking.getBkgRqstStatusSeq());
+//            bookingEntity.setBkgNo(booking.getBkgNo());
+//            bookingEntity.setBkgRqstStatusSeq(booking.getBkgRqstStatusSeq());
+            BeanUtils.copyProperties(booking, bookingEntity, "id");
+            log.info("changedBookingEntity: " + bookingEntity);
             BookingEntity saved = bookingRepository.save(bookingEntity);
             log.info("saved: " + saved);
             return saved;
@@ -76,6 +79,15 @@ public class BookingServiceImpl implements BookingService {
     public ContactEntity createContact(ContactEntity request) {
         log.info("in BookingServiceImpl::createContact");
         return contactRepository.save(request);
+    }
+
+    @Override
+    public ContactEntity fetchContact(Long id) {
+        Optional<ContactEntity> contactEntity = contactRepository.findById(id);
+        if (contactEntity.isPresent()) {
+            return contactEntity.get();
+        }
+        throw new NoResultException("Contact to be fetched not found");
     }
 
     @Override
@@ -105,8 +117,10 @@ public class BookingServiceImpl implements BookingService {
             log.info("in BookingServiceImpl::editContact");
             ContactEntity contactEntity = result.get();
             log.info("contactEntity: " + contactEntity);
-            contactEntity.setName(contact.getName());
-            contactEntity.setMobileNo(contact.getMobileNo());
+
+            BeanUtils.copyProperties(contact, contactEntity, "id");
+
+
             return contactRepository.save(contactEntity);
         }
         throw new NoResultException("Contact to be edited not found");
