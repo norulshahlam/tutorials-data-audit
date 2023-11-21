@@ -53,6 +53,7 @@ public class BookingController {
         BookingEntity booking = service.createBooking(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(booking);
     }
+
     @ApiResponse(responseCode = "200", description = "Booking fetched",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Fetch booking",
@@ -87,6 +88,7 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.deleteBooking(id));
     }
 
+
     @ApiResponse(responseCode = "200", description = "contact created",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Create new contact",
@@ -99,16 +101,18 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(booking);
     }
 
-    @ApiResponse(responseCode = "200", description = "Contact deleted",
+    @ApiResponse(responseCode = "200", description = "Contact fetched",
             content = @Content(mediaType = "application/json"))
-    @Operation(summary = "Delete existing Contact",
-            description = "This endpoint will delete existing contact")
-    @DeleteMapping("deleteContact/{id}")
-    public ResponseEntity<String> deleteContact(@PathVariable Long id) {
-        log.info("in BookingController::deleteContact");
+    @Operation(summary = "Fetch Contact",
+            description = "This endpoint will Fetch Contact based on id")
+    @GetMapping("fetchContact/{id}")
+    public ResponseEntity<ContactEntity> fetchContact(@PathVariable Long id) {
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.deleteContact(id));
+        log.info("in BookingController::fetchContact");
+        ContactEntity booking = service.fetchContact(id);
+        return ResponseEntity.status(HttpStatus.OK).body(booking);
     }
+
     @ApiResponse(responseCode = "200", description = "Contact Edited",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Edit existing contact",
@@ -118,5 +122,16 @@ public class BookingController {
         log.info("in BookingController::editContact");
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.editContact(request));
+    }
+
+    @ApiResponse(responseCode = "200", description = "Contact deleted",
+            content = @Content(mediaType = "application/json"))
+    @Operation(summary = "Delete existing Contact",
+            description = "This endpoint will delete existing contact")
+    @DeleteMapping("deleteContact/{id}")
+    public ResponseEntity<String> deleteContact(@PathVariable Long id) {
+        log.info("in BookingController::deleteContact");
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.deleteContact(id));
     }
 }
