@@ -3,7 +3,6 @@ package com.example.userregistration.controller;
 import com.example.userregistration.entity.BookingEntity;
 import com.example.userregistration.entity.ContactEntity;
 import com.example.userregistration.service.BookingService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -72,7 +71,7 @@ public class BookingController {
     @Operation(summary = "Edit existing user",
             description = "This endpoint will edit existing booking")
     @PostMapping("editBooking")
-    public ResponseEntity<BookingEntity> editBooking(@Valid @RequestBody @NotBlank BookingEntity request) throws JsonProcessingException {
+    public ResponseEntity<BookingEntity> editBooking(@Valid @RequestBody @NotBlank BookingEntity request) {
         log.info("in BookingController::editBooking");
         BookingEntity booking = service.editBooking(request);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(booking);
