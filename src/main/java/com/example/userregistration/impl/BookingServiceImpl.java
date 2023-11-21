@@ -51,11 +51,9 @@ public class BookingServiceImpl implements BookingService {
         if (result.isPresent()) {
             log.info("in BookingServiceImpl::editBooking");
             BookingEntity bookingEntity = result.get();
-            log.info("bookingEntity: " + bookingEntity);
-//            bookingEntity.setBkgNo(booking.getBkgNo());
-//            bookingEntity.setBkgRqstStatusSeq(booking.getBkgRqstStatusSeq());
-            BeanUtils.copyProperties(booking, bookingEntity, "id");
-            log.info("changedBookingEntity: " + bookingEntity);
+            bookingEntity.setBkgNo(booking.getBkgNo());
+            bookingEntity.setBkgRqstStatusSeq(booking.getBkgRqstStatusSeq());
+
             BookingEntity saved = bookingRepository.save(bookingEntity);
             log.info("saved: " + saved);
             return saved;

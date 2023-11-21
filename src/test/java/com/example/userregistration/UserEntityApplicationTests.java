@@ -69,7 +69,7 @@ class UserEntityApplicationTests {
 
     Faker faker = new Faker();
 
-    @RepeatedTest(2)
+    @RepeatedTest(10)
     @Order(1)
     @DisplayName("Create Booking using java object")
     void createBooking() throws JsonProcessingException {
@@ -102,7 +102,7 @@ class UserEntityApplicationTests {
         assertThat(all, hasSize(greaterThanOrEqualTo(1)));
     }
 
-    @RepeatedTest(1)
+    @RepeatedTest(10)
     @Order(5)
     @DisplayName("Edit booking using java object")
     void editBooking() {
@@ -136,7 +136,7 @@ class UserEntityApplicationTests {
 
     }
 
-    @RepeatedTest(1)
+    @RepeatedTest(10)
     @Order(6)
     @DisplayName("Edit Contact using java object")
     void editContact() throws JsonProcessingException {
