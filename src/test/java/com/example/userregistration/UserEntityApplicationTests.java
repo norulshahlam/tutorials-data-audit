@@ -38,6 +38,7 @@ class UserEntityApplicationTests {
     private static RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+
     @Autowired
     private BookingRepository bookingRepository;
     @Autowired
