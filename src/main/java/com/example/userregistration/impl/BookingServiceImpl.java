@@ -69,71 +69,6 @@ public class BookingServiceImpl implements BookingService {
         bookingEntity.setBkgRqstNo(booking.getBkgRqstNo());
         bookingEntity.setBkgRqstStatusSeq(booking.getBkgRqstStatusSeq());
         bookingEntity.setBkgNo(booking.getBkgNo());
-        bookingEntity.setSiNo(booking.getSiNo());
-        bookingEntity.setBkgOfficeCode(booking.getBkgOfficeCode());
-        bookingEntity.setHandleOfficeCode(booking.getHandleOfficeCode());
-        bookingEntity.setVslCode(booking.getVslCode());
-        bookingEntity.setSkdVoyNo(booking.getSkdVoyNo());
-        bookingEntity.setSkdDirCode(booking.getSkdDirCode());
-        bookingEntity.setVslName(booking.getVslName());
-        bookingEntity.setPorCode(booking.getPorCode());
-        bookingEntity.setPorName(booking.getPorName());
-        bookingEntity.setPolCode(booking.getPolCode());
-        bookingEntity.setPolName(booking.getPolName());
-        bookingEntity.setPodCode(booking.getPodCode());
-        bookingEntity.setPodName(booking.getPodName());
-        bookingEntity.setDelCode(booking.getDelCode());
-        bookingEntity.setDelName(booking.getDelName());
-        bookingEntity.setPkgQty(booking.getPkgQty());
-        bookingEntity.setPkgTypeCode(booking.getPkgTypeCode());
-        bookingEntity.setMeasQty(booking.getMeasQty());
-        bookingEntity.setMeasUnitCode(booking.getMeasUnitCode());
-        bookingEntity.setNetWgt(booking.getNetWgt());
-        bookingEntity.setNetWgtUnitCode(booking.getNetWgtUnitCode());
-        bookingEntity.setNetMeasQty(booking.getNetMeasQty());
-        bookingEntity.setNetMeasUnitCode(booking.getNetMeasUnitCode());
-        bookingEntity.setDcFlg(booking.getDcFlg());
-        bookingEntity.setRcFlg(booking.getRcFlg());
-        bookingEntity.setAwkCgoFlg(booking.getAwkCgoFlg());
-        bookingEntity.setRqstDate(booking.getRqstDate());
-        bookingEntity.setRqstDeltFlg(booking.getRqstDeltFlg());
-        bookingEntity.setBkgUpldStatusCode(booking.getBkgUpldStatusCode());
-        bookingEntity.setRqstDepDate(booking.getRqstDepDate());
-        bookingEntity.setRqstArrDate(booking.getRqstArrDate());
-        bookingEntity.setBkgRmks1(booking.getBkgRmks1());
-        bookingEntity.setBkgRmks2(booking.getBkgRmks2());
-        bookingEntity.setAutoCfmEdiFlg(booking.getAutoCfmEdiFlg());
-        bookingEntity.setAutoEmailFlg(booking.getAutoEmailFlg());
-        bookingEntity.setGdsDesc(booking.getGdsDesc());
-        bookingEntity.setMkDesc(booking.getMkDesc());
-        bookingEntity.setRqstAcptUsrId(booking.getRqstAcptUsrId());
-        bookingEntity.setRqstAcptUpdDate(booking.getRqstAcptUpdDate());
-        bookingEntity.setObTrspModCode(booking.getObTrspModCode());
-        bookingEntity.setIbTrspModCode(booking.getIbTrspModCode());
-        bookingEntity.setTemplateName(booking.getTemplateName());
-        bookingEntity.setDeleteFlag(booking.getDeleteFlag());
-        bookingEntity.setBlNo(booking.getBlNo());
-        bookingEntity.setSiRqstStatusCode(booking.getSiRqstStatusCode());
-        bookingEntity.setBlRdyTpCode(booking.getBlRdyTpCode());
-        bookingEntity.setBlCpyKnt(booking.getBlCpyKnt());
-        bookingEntity.setOblRdemKnt(booking.getOblRdemKnt());
-        bookingEntity.setBlRdyOfficeCode(booking.getBlRdyOfficeCode());
-        bookingEntity.setBlRdyUsrId(booking.getBlRdyUsrId());
-        bookingEntity.setBlRdyDate(booking.getBlRdyDate());
-        bookingEntity.setDgRmks(booking.getDgRmks());
-        bookingEntity.setActVoyNo(booking.getActVoyNo());
-        bookingEntity.setStatus(booking.getStatus());
-        bookingEntity.setTransitTime(booking.getTransitTime());
-        bookingEntity.setVoyageCode(booking.getVoyageCode());
-        bookingEntity.setService(booking.getService());
-        bookingEntity.setGateInCutoffDate(booking.getGateInCutoffDate());
-        bookingEntity.setVgmCutoffDate(booking.getVgmCutoffDate());
-        bookingEntity.setDocumentationCutoffDate(booking.getDocumentationCutoffDate());
-        bookingEntity.setDocTpCode(booking.getDocTpCode());
-        bookingEntity.setBkgRqstsStatusCode(booking.getBkgRqstsStatusCode());
-
-        bookingEntity.setBkgNo(booking.getBkgNo());
-        bookingEntity.setBkgRqstStatusSeq(booking.getBkgRqstStatusSeq());
 
         bookingEntity.getContracts().clear();
         bookingEntity.getContracts().addAll(booking.getContracts());
@@ -141,26 +76,6 @@ public class BookingServiceImpl implements BookingService {
         bookingEntity.getContacts().clear();
         bookingEntity.getContacts().addAll(booking.getContacts());
 
-        bookingEntity.getCustomers().clear();
-        bookingEntity.getCustomers().addAll(booking.getCustomers());
-
-        bookingEntity.getCommodities().clear();
-        bookingEntity.getCommodities().addAll(booking.getCommodities());
-
-        bookingEntity.getCustomers().clear();
-        bookingEntity.getCustomers().addAll(booking.getCustomers());
-
-        bookingEntity.getEquipments().clear();
-        bookingEntity.getEquipments().addAll(booking.getEquipments());
-
-        bookingEntity.getDangerousGoods().clear();
-        bookingEntity.getDangerousGoods().addAll(booking.getDangerousGoods());
-
-        bookingEntity.getVesselVoyages().clear();
-        bookingEntity.getVesselVoyages().addAll(booking.getVesselVoyages());
-
-        bookingEntity.getRefeerCargos().clear();
-        bookingEntity.getRefeerCargos().addAll(booking.getRefeerCargos());
     }
 
     @Override
