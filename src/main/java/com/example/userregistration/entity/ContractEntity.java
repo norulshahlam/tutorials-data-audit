@@ -1,6 +1,5 @@
 package com.example.userregistration.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -58,8 +57,4 @@ public class ContractEntity extends AuditEntity implements Serializable {
             requiredMode = Schema.RequiredMode.REQUIRED)
     private String status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BOOKING_ID")
-    @JsonIgnore
-    private BookingEntity bookingEntity;
 }

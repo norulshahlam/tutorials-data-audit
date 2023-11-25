@@ -1,13 +1,12 @@
 package com.example.userregistration.controller;
 
 import com.example.userregistration.entity.BookingEntity;
-import com.example.userregistration.entity.ContactEntity;
+import com.example.userregistration.entity.ContractEntity;
 import com.example.userregistration.service.JaversService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.javers.core.Changes;
 import org.javers.core.Javers;
-import org.javers.core.changelog.SimpleTextChangeLog;
 import org.javers.core.diff.Change;
 import org.javers.core.json.JsonConverter;
 import org.javers.core.metamodel.object.CdoSnapshot;
@@ -52,35 +51,33 @@ public class AuditController {
     @GetMapping("/bookingPretty/{id}")
     public ResponseEntity<String> getBookingEntityChangesPrettyWithChildById(
             @PathVariable Long id) {
-        JqlQuery jqlQuery = QueryBuilder.byInstanceId(id, BookingEntity.class).withChildValueObjects().build();
-
-
+        JqlQuery jqlQuery = QueryBuilder.byInstanceId(id, BookingEntity.class)
+                .withChildValueObjects().build();
         Changes changes = javers.findChanges(jqlQuery);
-
-        System.out.println(javers.processChangeList(changes,new SimpleTextChangeLog()));
 
         return ResponseEntity.ok().body("<pre>" + changes.prettyPrint() + "</pre>");
     }
 
 
-    @GetMapping("/contactPretty")
-    public ResponseEntity<String> getContactEntityChangesPretty() {
-        QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
+    @GetMapping("/contractsPretty/{id}")
+    public ResponseEntity<String> getContractEntityChangesPretty(
+            @PathVariable Long id) {
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id,ContractEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
         return ResponseEntity.ok().body("<pre>" + changes.prettyPrint() + "</pre>");
     }
 
-    @GetMapping("/contact")
-    public ResponseEntity<String> getContactEntityChanges() {
-        QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
+    @GetMapping("/contracts")
+    public ResponseEntity<String> getContractEntityChanges() {
+        QueryBuilder jqlQuery = QueryBuilder.byClass(ContractEntity.class);
         List<Change> changes = javers.findChanges(jqlQuery.build());
         return ResponseEntity.ok().body(javers.getJsonConverter().toJson(changes));
     }
 
 
-    @GetMapping("/contact/snapshots")
-    public String getContactEntitySnapshots() {
-        QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
+    @GetMapping("/contracts/snapshots")
+    public String getContractEntitySnapshots() {
+        QueryBuilder jqlQuery = QueryBuilder.byClass(ContractEntity.class);
 
         List<CdoSnapshot> changes = new ArrayList(javers.findSnapshots(jqlQuery.build()));
 
@@ -107,10 +104,10 @@ public class AuditController {
         return jsonConverter.toJson(changes);
     }
 
-    @GetMapping("/contact/{id}")
+    @GetMapping("/contracts/{id}")
     public String getContactEntityChanges(@PathVariable String id) {
         QueryBuilder jqlQuery = QueryBuilder
-                .byInstanceId(id, ContactEntity.class)
+                .byInstanceId(id, ContractEntity.class)
                 .withNewObjectChanges();
 
         Changes changes = javers.findChanges(jqlQuery.build());

@@ -233,35 +233,44 @@ public class BookingEntity extends AuditEntity implements Serializable {
 
     @Column(name = "DOCUMENTATION_CUTOFF_DATE")
     private Date documentationCutoffDate;
+
     @Builder.Default
-    @OneToMany(mappedBy = "bookingEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "bookingId", referencedColumnName = "id")
     private List<ContractEntity> contracts = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "bookingEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "bookingId", referencedColumnName = "id")
     private List<ContactEntity> contacts = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "bookingEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "bookingId", referencedColumnName = "id")
     private List<CommodityEntity> commodities = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "bookingEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "bookingId", referencedColumnName = "id")
     private List<CustomerEntity> customers = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "bookingEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "bookingId", referencedColumnName = "id")
     private List<EquipmentsEntity> equipments = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "bookingEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "bookingId", referencedColumnName = "id")
     private List<DangerousGoodsEntity> dangerousGoods = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "bookingEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "bookingId", referencedColumnName = "id")
     private List<VesselVoyageEntity> vesselVoyages = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "bookingEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "bookingId", referencedColumnName = "id")
     private List<RefeerCargoEntity> refeerCargos = new ArrayList<>();
 }

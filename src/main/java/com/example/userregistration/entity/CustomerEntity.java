@@ -1,6 +1,5 @@
 package com.example.userregistration.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -80,13 +79,4 @@ public class CustomerEntity extends AuditEntity implements Serializable {
 
     @Column(name = "STATUS")
     private String status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BOOKING_ID")
-    @JsonIgnore
-    private BookingEntity bookingEntity;
-
-
-
-
 }
