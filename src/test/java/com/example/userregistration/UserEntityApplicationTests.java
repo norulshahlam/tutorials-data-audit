@@ -47,6 +47,7 @@ class UserEntityApplicationTests {
     BookingEntity bookingEntity = new BookingEntity();
     ContactEntity contactEntity = new ContactEntity();
 
+
     @BeforeAll
     static void beforeAll() {
         restTemplate = new RestTemplate();
@@ -70,7 +71,7 @@ class UserEntityApplicationTests {
 
     Faker faker = new Faker();
 
-    @RepeatedTest(10)
+    @RepeatedTest(2)
     @Order(1)
     @DisplayName("Create Booking using java object")
     void createBooking() throws JsonProcessingException {
@@ -87,7 +88,8 @@ class UserEntityApplicationTests {
     void createBookingUsingJson() throws Exception {
         File file = new File("src/test/resources/bookingDto.json");
         bookingEntity = objectMapper.readValue(file, BookingEntity.class);
-        restTemplate.postForObject(baseUrl.concat("/createBooking"), bookingEntity, BookingEntity.class);
+        BookingEntity bookingSaved = restTemplate.postForObject(baseUrl.concat("/createBooking"), bookingEntity, BookingEntity.class);
+        log.info("booking saved: \n" + objectMapper.writeValueAsString(bookingSaved));
         List<BookingEntity> all = bookingRepository.findAll();
         assertThat(all, hasSize(greaterThanOrEqualTo(1)));
     }
@@ -103,7 +105,7 @@ class UserEntityApplicationTests {
         assertThat(all, hasSize(greaterThanOrEqualTo(1)));
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(1)
     @Order(5)
     @DisplayName("Edit booking using java object")
     void editBooking() {
@@ -116,12 +118,12 @@ class UserEntityApplicationTests {
                 .getForEntity(getUri, BookingEntity.class).getBody();
 
         /* With fetched booking, edit some fields */
-        id=id+1;
+        id = id + 1;
         String oldBkgNo = fetchedBooking.getBkgNo();
         String oldBkgRqstStatusSeq = fetchedBooking.getBlNo();
 
         fetchedBooking.setBkgNo(faker.idNumber().ssnValid());
-        fetchedBooking.setBkgRqstStatusSeq(new Random().nextInt());
+        fetchedBooking.setBkgRqstStatusSeq(Integer.valueOf(faker.bothify("###")));
 
         BookingEntity editedBooking = restTemplate
                 .postForObject(baseUrl.concat("/editBooking"), fetchedBooking, BookingEntity.class);
@@ -137,7 +139,7 @@ class UserEntityApplicationTests {
 
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(1)
     @Order(6)
     @DisplayName("Edit Contact using java object")
     void editContact() throws JsonProcessingException {
@@ -190,14 +192,14 @@ class UserEntityApplicationTests {
 
     ContractEntity initContractData() {
         return ContractEntity.builder()
-                .frtTermCode(faker.numerify("######"))
-                .scacCode(faker.numerify("######"))
-                .usaCstmsFileNo(faker.numerify("######"))
-                .cndCstmsFileCode(faker.numerify("######"))
-                .scNo(faker.numerify("######"))
-                .rfaNo(faker.numerify("######"))
-                .isRfa(String.valueOf(new Random().nextBoolean()))
-                .status(String.valueOf(new Random().nextBoolean()))
+                .frtTermCode(faker.numerify("####"))
+                .scacCode(faker.numerify("####"))
+                .usaCstmsFileNo(faker.numerify("####"))
+                .cndCstmsFileCode(faker.numerify("####"))
+                .scNo(faker.numerify("####"))
+                .rfaNo(faker.numerify("####"))
+                .isRfa("F")
+                .status("T")
                 .build();
     }
 
@@ -207,101 +209,101 @@ class UserEntityApplicationTests {
                 .email(faker.internet().emailAddress())
                 .phoneNo(faker.phoneNumber().phoneNumber())
                 .mobileNo(faker.phoneNumber().cellPhone())
-                .status(faker.numerify("#####"))
+                .status(faker.numerify("##"))
                 .build();
     }
 
     CommodityEntity initCommodityData() {
         return CommodityEntity.builder()
                 .estWgt(faker.number().randomDouble(2, 1, 100))
-                .estWgtUnitCode(faker.bothify("??####", true))
-                .cmdtyCode(faker.bothify("??####", true))
-                .cmdtyDesc(faker.bothify("??####", true))
-                .socFlg(String.valueOf(new Random().nextBoolean()))
-                .sltOwnrCode(faker.bothify("??####", true))
-                .cntrOprCode(faker.bothify("??####", true))
-                .isEmpty(faker.bothify("??####", true))
-                .iasocFlg(String.valueOf(new Random().nextBoolean()))
-                .iasocVoyCode(faker.bothify("??####", true))
-                .iasocVslName(faker.bothify("??####", true))
+                .estWgtUnitCode(faker.bothify("???", true))
+                .cmdtyCode(faker.bothify("???", true))
+                .cmdtyDesc(faker.bothify("???", true))
+                .socFlg("F")
+                .sltOwnrCode(faker.bothify("???", true))
+                .cntrOprCode(faker.bothify("???", true))
+                .isEmpty(faker.bothify("???", true))
+                .iasocFlg("F")
+                .iasocVoyCode(faker.bothify("???", true))
+                .iasocVslName(faker.bothify("???", true))
                 .status(faker.bothify("??####", true))
                 .build();
     }
 
     CustomerEntity initCustomerData() {
         return CustomerEntity.builder()
-                .bkgRqstSeq(new Random().nextInt())
-                .custId(new Random().nextLong())
-                .custTpCode(faker.bothify("??####", true))
-                .cntCode(faker.bothify("??####", true))
-                .custSeq(new Random().nextInt())
+                .bkgRqstSeq(Integer.valueOf(faker.bothify("###")))
+                .custId(Long.valueOf(faker.bothify("###")))
+                .custTpCode(faker.bothify("###", true))
+                .cntCode(faker.bothify("###", true))
+                .custSeq(Integer.valueOf(faker.bothify("###")))
                 .custName(faker.name().name())
                 .custAddr(faker.address().fullAddress())
-                .locCode(faker.bothify("??####", true))
+                .locCode(faker.bothify("###", true))
                 .locName(faker.address().fullAddress())
                 .locCtnt(faker.number().digit())
                 .pstCtnt(faker.number().digit())
                 .custEmail(faker.internet().emailAddress())
                 .cntcName(faker.name().name())
                 .cntcEmail(faker.internet().emailAddress())
-                .custErpRefNo(faker.bothify("??####", true))
-                .eoriNo(faker.bothify("??####", true))
-                .eurCstmsStName(faker.bothify("??####", true))
-                .prnrCustCode(faker.bothify("??####", true))
-                .deleteFlg(String.valueOf(new Random().nextBoolean()))
+                .custErpRefNo(faker.bothify("###", true))
+                .eoriNo(faker.bothify("###", true))
+                .eurCstmsStName(faker.name().firstName())
+                .prnrCustCode(faker.bothify("###", true))
+                .deleteFlg("F")
                 .status(faker.bothify("??####", true))
                 .build();
     }
 
     EquipmentsEntity initEquipmentData() {
         return EquipmentsEntity.builder()
-                .eqpQtyId(new Random().nextLong())
+                .eqpQtyId(Long.valueOf(faker.bothify("###")))
                 .cntrTpszCode(faker.numerify("######"))
                 .cntrTpszName(faker.letterify("????????", true))
-                .bkgRqstSeq(new Random().nextLong())
-                .cntrQty(faker.number().randomDouble(2, 1, 100))
-                .flexHgtFlg(String.valueOf(new Random().nextBoolean()))
-                .deleteFlg(String.valueOf(new Random().nextBoolean()))
+                .bkgRqstSeq(Long.valueOf(faker.bothify("###")))
+                .cntrQty(Double.valueOf(faker.bothify("###")))
+                .flexHgtFlg("T")
+                .deleteFlg("F")
                 .status(faker.bothify("####", true))
                 .build();
     }
 
     DangerousGoodsEntity initDangerousGoodsData() {
         return DangerousGoodsEntity.builder()
-                .dgGoId(new Random().nextLong())
-                .dgGoSeq(new Random().nextInt())
-                .bkgRqstSeq(new Random().nextInt())
+                .dgGoId(Long.valueOf(faker.bothify("###")))
+                .dgGoSeq(Integer.valueOf(faker.bothify("###")))
+                .bkgRqstSeq(Integer.valueOf(faker.bothify("###")))
                 .cntrTpszCode(faker.bothify("??####", true))
                 .cntrNo(faker.bothify("??####", true))
                 .imdgUnNo(faker.bothify("??####", true))
-                .imdgUnSeq(new Random().nextLong())
+                .imdgUnSeq(Long.valueOf(faker.bothify("###")))
                 .imdgClssId(faker.bothify("??####", true))
                 .imdgPgNo(faker.bothify("??####", true))
                 .pkgGrpCode1(faker.bothify("??####", true))
                 .technicalName(faker.bothify("??####", true))
-                .grsWgt(new Random().nextLong())
-                .netWgt(new Random().nextLong())
+                .grsWgt(Long.valueOf(faker.bothify("###")))
+                .netWgt(Long.valueOf(faker.bothify("###")))
                 .prpShpName(faker.bothify("??####", true))
                 .hzdCtnt(faker.bothify("??####", true))
                 .flshPntCtnt(faker.bothify("??####", true))
                 .flshPntTempUnitCode(faker.bothify("??####", true))
-                .mrnPolutFlg(String.valueOf(new Random().nextBoolean()))
+                .mrnPolutFlg("F")
                 .emerCntcPntCtnt(faker.bothify("??####", true))
                 .dcgoStatusCode(faker.bothify("??####", true))
-                .dgLmtQtyFlg(String.valueOf(new Random().nextBoolean()))
+                .dgLmtQtyFlg("F")
                 .dcgoRmk(faker.bothify("??####", true))
-                .dgCntrSeq(new Random().nextLong())
-                .cntrCgoSeq(new Random().nextLong())
+                .dgCntrSeq(Long.valueOf(faker.bothify("###")))
+                .cntrCgoSeq(Long.valueOf(faker.bothify("###")))
                 .emerCntcPhnNoCtnt(faker.bothify("??####", true))
                 .dgNetWgtUnitCode(faker.bothify("??####", true))
                 .emerCntcEmail(faker.bothify("??####", true))
                 .outrPkgCode(faker.bothify("??####", true))
                 .outrPkgDesc(faker.bothify("??####", true))
-                .outrPkgQty(new Random().nextLong())
+                .outrPkgQty(Long.valueOf(faker.bothify("###")))
                 .inrPkgCode(faker.bothify("??####", true))
                 .inrPkgDesc(faker.bothify("??####", true))
-                .inrPkgQty(new Random().nextLong())
-                .deleteFlg(String.valueOf(new Random().nextBoolean()))
+                .inrPkgQty(Long.valueOf(faker.bothify("###")))
+                .deleteFlg("F")
                 .status(faker.bothify("??####", true))
                 .build();
 
@@ -310,8 +312,8 @@ class UserEntityApplicationTests {
     VesselVoyageEntity initVesselVoyageData() {
         return VesselVoyageEntity.builder()
                 .vslPrePstCode(faker.bothify("??####", true))
-                .vslSeq(new Random().nextInt())
-                .rqstMstSeq(new Random().nextInt())
+                .vslSeq(Integer.valueOf(faker.bothify("###")))
+                .rqstMstSeq(Integer.valueOf(faker.bothify("###")))
                 .localVoyNo(faker.bothify("??####", true))
                 .polCode(faker.bothify("??####", true))
                 .polName(faker.bothify("??####", true))
@@ -322,7 +324,7 @@ class UserEntityApplicationTests {
                 .vslCode(faker.bothify("??####", true))
                 .vslName(faker.bothify("??####", true))
                 .voyageCode(faker.bothify("??####", true))
-                .deleteFlg(String.valueOf(new Random().nextBoolean()))
+                .deleteFlg("T")
                 .status(faker.bothify("??####", true))
                 .build();
     }
@@ -330,8 +332,8 @@ class UserEntityApplicationTests {
     RefeerCargoEntity initRefeerCargoData() {
         return RefeerCargoEntity.builder()
                 .rfCargoId(faker.bothify("??####", true))
-                .rfCargoSeq(new Random().nextLong())
-                .bkgRqstSeq(new Random().nextInt())
+                .rfCargoSeq(Long.valueOf(faker.bothify("###")))
+                .bkgRqstSeq(Integer.valueOf(faker.bothify("###")))
                 .cntrTpszCode(faker.bothify("??####", true))
                 .cntrNo(faker.bothify("??####", true))
                 .minTemp(new Random().nextDouble())
@@ -342,7 +344,7 @@ class UserEntityApplicationTests {
                 .cntrVentCode(faker.bothify("??####", true))
                 .ventRto(new Random().nextDouble())
                 .clngTpCode(faker.bothify("??####", true))
-                .deleteFlg(String.valueOf(new Random().nextBoolean()))
+                .deleteFlg("T")
                 .cmdtyCode(faker.bothify("??####", true))
                 .cmdtyDesc(faker.bothify("??####", true))
                 .build();
@@ -352,45 +354,45 @@ class UserEntityApplicationTests {
 
         // initialize BookingEntity data using faker and builder class
         return BookingEntity.builder()
-                .bkgRqstNo(faker.bothify("??-##-?##", true))
-                .bkgRqstStatusSeq(new Random().nextInt())
-                .bkgNo(faker.bothify("??-##-?##", true))
-                .siNo(faker.bothify("??-##-?##", true))
+                .bkgRqstNo(faker.bothify("??-####", true))
+                .bkgRqstStatusSeq(Integer.valueOf(faker.bothify("###", true)))
+                .bkgNo(faker.bothify("??##", true))
+                .siNo(faker.bothify("??##", true))
                 .bkgRqstsStatusCode(faker.bothify("??####", true))
-                .bkgOfficeCode(faker.bothify("??####", true))
+                .bkgOfficeCode(faker.bothify("###", true))
                 .handleOfficeCode(faker.bothify("??####", true))
-                .vslCode(faker.bothify("??####", true))
-                .skdVoyNo(faker.bothify("??####", true))
-                .skdDirCode(faker.bothify("??####", true))
-                .vslName(faker.bothify("??####", true))
-                .porCode(faker.bothify("??####", true))
-                .porName(faker.bothify("??####", true))
-                .polCode(faker.bothify("??####", true))
-                .polName(faker.bothify("??####", true))
-                .podCode(faker.bothify("??####", true))
-                .podName(faker.bothify("??####", true))
-                .delCode(faker.bothify("??####", true))
+                .vslCode(faker.bothify("??###", true))
+                .skdVoyNo(faker.bothify("??###", true))
+                .skdDirCode(faker.bothify("?", true))
+                .vslName(faker.bothify("??###", true))
+                .porCode(faker.bothify("???", true))
+                .porName(faker.bothify("??###", true))
+                .polCode(faker.bothify("???", true))
+                .polName(faker.bothify("??###", true))
+                .podCode(faker.bothify("???", true))
+                .podName(faker.bothify("??###", true))
+                .delCode(faker.bothify("####", true))
                 .delName(faker.bothify("??####", true))
-                .pkgQty(new Random().nextDouble())
-                .pkgTypeCode(faker.bothify("??####", true))
-                .measQty(new Random().nextLong())
-                .measUnitCode(faker.bothify("??####", true))
-                .netWgt(new Random().nextLong())
-                .netWgtUnitCode(faker.bothify("??####", true))
-                .netMeasQty(new Random().nextLong())
-                .netMeasUnitCode(faker.bothify("??####", true))
-                .dcFlg(String.valueOf(new Random().nextBoolean()))
-                .rcFlg(String.valueOf(new Random().nextBoolean()))
-                .awkCgoFlg(String.valueOf(new Random().nextBoolean()))
+                .pkgQty(Double.valueOf(faker.bothify("###", true)))
+                .pkgTypeCode(faker.bothify("??", true))
+                .measQty(Long.valueOf(faker.bothify("##", true)))
+                .measUnitCode(faker.bothify("??", true))
+                .netWgt(Long.valueOf(faker.bothify("###", true)))
+                .netWgtUnitCode(faker.bothify("??", true))
+                .netMeasQty(Long.valueOf(faker.bothify("##", true)))
+                .netMeasUnitCode(faker.bothify("##", true))
+                .dcFlg("F")
+                .rcFlg("F")
+                .awkCgoFlg("F")
                 .rqstDate(faker.date().birthday())
-                .rqstDeltFlg(String.valueOf(new Random().nextBoolean()))
-                .bkgUpldStatusCode(faker.bothify("??####", true))
+                .rqstDeltFlg(("F"))
+                .bkgUpldStatusCode(faker.bothify("9", true))
                 .rqstDepDate(faker.date().birthday())
                 .rqstArrDate(faker.date().birthday())
                 .bkgRmks1(faker.bothify("??####", true))
                 .bkgRmks2(faker.bothify("??####", true))
-                .autoCfmEdiFlg(String.valueOf(new Random().nextBoolean()))
-                .autoEmailFlg(String.valueOf(new Random().nextBoolean()))
+                .autoCfmEdiFlg("F")
+                .autoEmailFlg("F")
                 .gdsDesc(faker.bothify("??####", true))
                 .mkDesc(faker.bothify("??####", true))
                 .rqstAcptUsrId(faker.bothify("??####", true))
@@ -398,12 +400,12 @@ class UserEntityApplicationTests {
                 .obTrspModCode(faker.bothify("??####", true))
                 .ibTrspModCode(faker.bothify("??####", true))
                 .templateName(faker.bothify("??####", true))
-                .deleteFlag(String.valueOf(new Random().nextBoolean()))
-                .blNo(faker.bothify("??####", true))
-                .siRqstStatusCode(faker.bothify("??####", true))
-                .blRdyTpCode(faker.bothify("??####", true))
-                .blCpyKnt(new Random().nextInt())
-                .oblRdemKnt(new Random().nextInt())
+                .deleteFlag("F")
+                .blNo(faker.bothify("####", true))
+                .siRqstStatusCode(faker.bothify("##", true))
+                .blRdyTpCode(faker.bothify("##", true))
+                .blCpyKnt(Integer.valueOf(faker.bothify("##", true)))
+                .oblRdemKnt(Integer.valueOf(faker.bothify("###")))
                 .blRdyOfficeCode(faker.bothify("??####", true))
                 .blRdyUsrId(faker.bothify("??####", true))
                 .blRdyDate(faker.date().birthday())

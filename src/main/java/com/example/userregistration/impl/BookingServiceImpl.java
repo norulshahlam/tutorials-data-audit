@@ -5,9 +5,12 @@ import com.example.userregistration.entity.ContactEntity;
 import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.repository.ContactRepository;
 import com.example.userregistration.service.BookingService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -25,19 +28,21 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final ContactRepository contactRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public BookingEntity createBooking(BookingEntity booking) {
+    public BookingEntity createBooking(BookingEntity booking) throws JsonProcessingException {
         log.info("in BookingServiceImpl::createBooking");
         log.info("booking: " + booking);
         return bookingRepository.save(booking);
     }
 
     @Override
-    public BookingEntity fetchBooking(Long id) {
+    public BookingEntity fetchBookingById(Long id) throws JsonProcessingException {
         Optional<BookingEntity> bookingEntity = bookingRepository.findById(id);
 
         if (bookingEntity.isPresent()) {
+            log.info("bookingEntity: " + objectMapper.writeValueAsString(bookingEntity.get()));
             return bookingEntity.get();
         }
         throw new NoResultException("Booking to be fetched not found");
@@ -51,8 +56,10 @@ public class BookingServiceImpl implements BookingService {
         if (result.isPresent()) {
             log.info("in BookingServiceImpl::editBooking");
             BookingEntity bookingEntity = result.get();
-            bookingEntity.setBkgNo(booking.getBkgNo());
-            bookingEntity.setBkgRqstStatusSeq(booking.getBkgRqstStatusSeq());
+//            bookingEntity.setBkgNo(booking.getBkgNo());
+//            bookingEntity.setBkgRqstStatusSeq(booking.getBkgRqstStatusSeq());
+
+            BeanUtils.copyProperties(booking, bookingEntity, "id");
 
             BookingEntity saved = bookingRepository.save(bookingEntity);
             log.info("saved: " + saved);
@@ -89,6 +96,15 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public BookingEntity fetchBookingByBkgRqstNo(String bkgRqstNo) {
+        BookingEntity byBkgRqstNo = bookingRepository.findByBkgRqstNo(bkgRqstNo);
+        if(ObjectUtils.isNotEmpty(byBkgRqstNo)){
+            return byBkgRqstNo;
+        }
+        throw new NoResultException("Booking to be fetched not found");
+    }
+
+    @Override
     public String deleteContact(Long id) {
         Optional<ContactEntity> result = contactRepository.findById(id);
 
@@ -117,8 +133,6 @@ public class BookingServiceImpl implements BookingService {
             log.info("contactEntity: " + contactEntity);
 
             BeanUtils.copyProperties(contact, contactEntity, "id");
-
-
             return contactRepository.save(contactEntity);
         }
         throw new NoResultException("Contact to be edited not found");

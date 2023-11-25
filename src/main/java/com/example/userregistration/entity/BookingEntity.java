@@ -1,10 +1,7 @@
 package com.example.userregistration.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,12 +15,12 @@ import java.util.List;
  */
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Builder
 @Entity
-
-@Data
 @Table(name = "BOOKING")
-public class BookingEntity implements Serializable {
+public class BookingEntity extends AuditEntity implements Serializable {
 
     public static final long serialVersionId = 1L;
 

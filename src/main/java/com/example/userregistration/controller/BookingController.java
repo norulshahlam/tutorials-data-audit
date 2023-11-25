@@ -3,6 +3,7 @@ package com.example.userregistration.controller;
 import com.example.userregistration.entity.BookingEntity;
 import com.example.userregistration.entity.ContactEntity;
 import com.example.userregistration.service.BookingService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -47,7 +48,7 @@ public class BookingController {
     @Operation(summary = "Create new booking",
             description = "This endpoint will Create new booking based on the given input data")
     @PostMapping("createBooking")
-    public ResponseEntity<BookingEntity> createBooking(@Valid @RequestBody @NotBlank BookingEntity request) {
+    public ResponseEntity<BookingEntity> createBooking(@Valid @RequestBody @NotBlank BookingEntity request) throws JsonProcessingException {
 
         log.info("in BookingController::createBooking");
         BookingEntity booking = service.createBooking(request);
@@ -59,10 +60,23 @@ public class BookingController {
     @Operation(summary = "Fetch booking",
             description = "This endpoint will Fetch booking based on id")
     @GetMapping("fetchBooking/{id}")
-    public ResponseEntity<BookingEntity> fetchBooking(@PathVariable Long id) {
+    public ResponseEntity<BookingEntity> fetchBookingById(@PathVariable Long id) throws JsonProcessingException {
 
         log.info("in BookingController::fetchBooking");
-        BookingEntity booking = service.fetchBooking(id);
+        BookingEntity booking = service.fetchBookingById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(booking);
+    }
+
+
+    @ApiResponse(responseCode = "200", description = "Booking fetched",
+            content = @Content(mediaType = "application/json"))
+    @Operation(summary = "Fetch booking",
+            description = "This endpoint will Fetch booking based on id")
+    @GetMapping("fetchBookingByBkgRqstNo/{bkgRqstNo}")
+    public ResponseEntity<BookingEntity> fetchBookingByBkgRqstNo(@PathVariable String bkgRqstNo) {
+
+        log.info("in BookingController::fetchBooking");
+        BookingEntity booking = service.fetchBookingByBkgRqstNo(bkgRqstNo);
         return ResponseEntity.status(HttpStatus.OK).body(booking);
     }
 

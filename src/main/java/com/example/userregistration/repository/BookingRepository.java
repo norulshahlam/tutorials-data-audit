@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 @JaversSpringDataAuditable
 public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
+
+    BookingEntity findByBkgRqstNo(String bkgRqstNo);
 }

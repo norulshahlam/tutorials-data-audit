@@ -1,5 +1,6 @@
 package com.example.userregistration.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,14 +12,13 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 @Entity
-
 @Table(name = "CUSTOMER")
 public class CustomerEntity extends AuditEntity implements Serializable {
 
     public static final long serialVersionId = 1L;
     @Id
     @Column(name = "ID", nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "BKG_RQST_SEQ")
@@ -83,6 +83,7 @@ public class CustomerEntity extends AuditEntity implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BOOKING_ID")
+    @JsonIgnore
     private BookingEntity bookingEntity;
 
 

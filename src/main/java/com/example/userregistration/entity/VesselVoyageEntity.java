@@ -1,5 +1,6 @@
 package com.example.userregistration.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 
@@ -21,7 +22,7 @@ public class VesselVoyageEntity extends AuditEntity implements Serializable {
 
     @Id
     @Column(name = "ID", nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "VSL_PRE_PST_CODE")
@@ -73,5 +74,6 @@ public class VesselVoyageEntity extends AuditEntity implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BOOKING_ID")
+    @JsonIgnore
     private BookingEntity bookingEntity;
 }
