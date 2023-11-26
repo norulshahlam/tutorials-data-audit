@@ -5,9 +5,9 @@ import com.example.userregistration.entity.ContactEntity;
 import com.example.userregistration.entity.ContractEntity;
 import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.service.JaversService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.javers.common.string.PrettyValuePrinter;
 import org.javers.core.Changes;
 import org.javers.core.Javers;
@@ -19,7 +19,6 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -90,7 +89,7 @@ public class AuditController {
 
     @GetMapping("/combinedEntities/{id}")
     public ResponseEntity<String> getAllEntityCombinedChangesPretty(
-            @PathVariable Long id) throws JsonProcessingException {
+            @PathVariable Long id) {
 
         /* Get Booking entity */
         JqlQuery bookingJqlQuery = QueryBuilder.byInstanceId(id, BookingEntity.class)
@@ -102,8 +101,8 @@ public class AuditController {
         LinkedList<Change> changes = new LinkedList<>(bookingChanges);
         bookingRepository.findById(id).ifPresent(bookingEntity -> {
 
-            /* Get contract entity */
-            if (!CollectionUtils.isEmpty(bookingEntity.getContracts())) {
+            /* Get contract entity changes */
+            if (ObjectUtils.isNotEmpty(bookingEntity.getContracts())) {
                 bookingEntity.getContracts().forEach(contractEntity -> {
                     JqlQuery contractJqlQuery = QueryBuilder.byInstanceId(contractEntity.getId(), ContractEntity.class).withChildValueObjects().build();
                     Changes contractChanges = javers.findChanges(contractJqlQuery);
@@ -111,8 +110,10 @@ public class AuditController {
                     changes.addAll(contractChanges);
                 });
             }
-            /* Get contract entity */
-            if (!CollectionUtils.isEmpty(bookingEntity.getContacts())) {
+
+            /* Get contract entity changes */
+
+            if (ObjectUtils.isNotEmpty(bookingEntity.getContacts())) {
                 bookingEntity.getContacts().forEach(contactEntity -> {
                     JqlQuery contactJqlQuery = QueryBuilder.byInstanceId(contactEntity.getId(), ContactEntity.class).withChildValueObjects().build();
                     Changes contactChanges = javers.findChanges(contactJqlQuery);
@@ -123,7 +124,8 @@ public class AuditController {
         });
         log.info("changes: {}\n", changes);
 
-        Changes combinedChanges = changes.stream()
+        /* Create Changes from the added changes while reverse sort by commit order  */
+         bookingChanges = changes.stream()
                 .filter(change -> change.getCommitMetadata().isPresent())
                 .sorted(Comparator.comparing(
                         i -> i.getCommitMetadata().get().getId(),
@@ -131,9 +133,9 @@ public class AuditController {
                 .collect(Collectors.collectingAndThen(Collectors.toList(),
                         sortedList -> new Changes(sortedList, new PrettyValuePrinter(new JaversCoreProperties.PrettyPrintDateFormats()))));
 
-        log.info("combinedChanges: {}\n", combinedChanges.prettyPrint());
+        log.info("combinedChanges: {}\n", bookingChanges.prettyPrint());
 
-        return ResponseEntity.ok().body("<pre>" + combinedChanges.prettyPrint());
+        return ResponseEntity.ok().body("<pre>" + bookingChanges.prettyPrint());
     }
 
     @GetMapping("/booking/snapshots")
