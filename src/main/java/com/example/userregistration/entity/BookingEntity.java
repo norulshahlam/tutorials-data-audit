@@ -24,7 +24,7 @@ public class BookingEntity extends AuditEntity implements Serializable {
     public static final long serialVersionId = 1L;
 
     @Id
-    @Column(name = "ID", nullable = false)
+    @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

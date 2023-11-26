@@ -18,7 +18,7 @@ public class ContactEntity extends AuditEntity implements Serializable {
     public static final long serialVersionId = 1L;
 
     @Id
-    @Column(name = "ID", nullable = false)
+    @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -29,20 +29,13 @@ public class ContactEntity extends AuditEntity implements Serializable {
     @Column(name = "NAME")
     private String name;
 
-
     @Column(name = "EMAIL")
     private String email;
 
-    @Column(name = "PHONE_NO")
-    private String phoneNo;
     @Schema(
             format = "string",
             example = "+65-92212152",
             requiredMode = Schema.RequiredMode.REQUIRED)
     @Column(name = "MOBILE_NO")
     private String mobileNo;
-
-    @Column(name = "STATUS")
-    private String status;
-
 }

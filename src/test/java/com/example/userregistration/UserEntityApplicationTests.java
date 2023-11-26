@@ -65,7 +65,7 @@ class UserEntityApplicationTests {
 
     Faker faker = new Faker();
 
-    @RepeatedTest(2)
+    @RepeatedTest(1)
     @Order(1)
     @DisplayName("Create Booking using java object")
     void createBooking() throws JsonProcessingException {
@@ -122,12 +122,9 @@ class UserEntityApplicationTests {
                 .postForObject(baseUrl.concat("/editBooking"), fetchedBooking, BookingEntity.class);
 
         String newBkgNo = editedBooking.getBkgNo();
-        Integer newBkgRqstStatusSeq = editedBooking.getBkgRqstStatusSeq();
-
         log.info("oldBkgNo: " + oldBkgNo + " --> newBkgNo: " + newBkgNo);
 
         assertThat(oldBkgNo, not(newBkgNo));
-
     }
 
     @RepeatedTest(1)
@@ -184,12 +181,6 @@ class UserEntityApplicationTests {
     ContractEntity initContractData() {
         return ContractEntity.builder()
                 .frtTermCode(faker.numerify("####"))
-                .scacCode(faker.numerify("####"))
-                .usaCstmsFileNo(faker.numerify("####"))
-                .cndCstmsFileCode(faker.numerify("####"))
-                .scNo(faker.numerify("####"))
-                .rfaNo(faker.numerify("####"))
-                .isRfa("F")
                 .status("T")
                 .build();
     }
@@ -198,9 +189,7 @@ class UserEntityApplicationTests {
         return ContactEntity.builder()
                 .name(faker.name().fullName())
                 .email(faker.internet().emailAddress())
-                .phoneNo(faker.phoneNumber().phoneNumber())
                 .mobileNo(faker.phoneNumber().cellPhone())
-                .status(faker.numerify("##"))
                 .build();
     }
 

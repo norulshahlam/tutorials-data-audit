@@ -20,7 +20,7 @@ public class ContractEntity extends AuditEntity implements Serializable {
     public static final long serialVersionId = 1L;
 
     @Id
-    @Column(name = "ID", nullable = false)
+    @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -30,25 +30,6 @@ public class ContractEntity extends AuditEntity implements Serializable {
             requiredMode = Schema.RequiredMode.REQUIRED)
     @Column(name = "FRT_TERM_CODE")
     private String frtTermCode;
-
-    @Column(name = "SCAC_CODE")
-    private String scacCode;
-
-    @Column(name = "USA_CSTMS_FILE_NO")
-    private String usaCstmsFileNo;
-
-    @Column(name = "CND_CSTMS_FILE_CODE")
-    private String cndCstmsFileCode;
-
-    @Column(name = "SC_NO")
-    private String scNo;
-
-    @Column(name = "RFA_NO")
-    private String rfaNo;
-
-    @Column(name = "IS_RFA"/*, nullable = false*/)
-    /*@ColumnDefault("Y")*/
-    private String isRfa;
 
     @Column(name = "STATUS")
     @Schema(
