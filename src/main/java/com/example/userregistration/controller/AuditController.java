@@ -6,25 +6,31 @@ import com.example.userregistration.entity.ContractEntity;
 import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.service.JaversService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.javers.common.string.PrettyValuePrinter;
 import org.javers.core.Changes;
+import org.javers.core.ChangesByCommit;
 import org.javers.core.Javers;
 import org.javers.core.JaversCoreProperties;
 import org.javers.core.commit.CommitId;
 import org.javers.core.diff.Change;
-import org.javers.core.json.JsonConverter;
-import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -87,66 +93,84 @@ public class AuditController {
         return ResponseEntity.ok().body("<pre>" + changes.groupByCommit());
     }
 
-    @GetMapping("/combinedEntities/{id}")
-    public ResponseEntity<String> getAllEntityCombinedChangesPretty(
-            @PathVariable Long id) {
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bad Request",
+                    content = @Content(examples = {
+                            @ExampleObject(name = "Changes found",
+                                    summary = "Changes found",
+                                    description = "Changes found",
+                                    value = """
+                                            [Commit 43.00 done by anonymousUser at 27 Nov 2023, 09:34:12 :
+                                            * changes on com.mypil.usermgmt.domain.entities.CompanyEntity/18 :
+                                              - 'updatedDate' changed: 'Mon Nov 27 09:32:39 SGT 2023' -> 'Mon Nov 27 09:34:12 SGT 2023'
+                                            * changes on com.mypil.usermgmt.domain.entities.UserRegistrationEntity/64 :
+                                              - 'updatedDate' changed: 'Mon Nov 27 09:32:39 SGT 2023' -> 'Mon Nov 27 09:34:12 SGT 2023'
+                                            * changes on com.mypil.usermgmt.domain.entities.UserRoleEntity/31 :
+                                              - 'roleCode' changed: 'Bill To Party' -> 'Bill To 11'
+                                              - 'updatedDate' changed: 'Mon Nov 27 09:32:39 SGT 2023' -> 'Mon Nov 27 09:34:12 SGT 2023'
+                                            , Commit 42.00 done by anonymousUser at 27 Nov 2023, 09:32:39 :
+                                            * changes on com.mypil.usermgmt.domain.entities.CompanyEntity/18 :
+                                              - 'updatedDate' changed: 'Mon Nov 27 08:59:53 SGT 2023' -> 'Mon Nov 27 09:32:39 SGT 2023'
+                                            * changes on com.mypil.usermgmt.domain.entities.UserRegistrationEntity/64 :
+                                              - 'firstName' changed: 'ss' -> '59ujkyv'
+                                              - 'updatedDate' changed: 'Mon Nov 27 08:59:53 SGT 2023' -> 'Mon Nov 27 09:32:39 SGT 2023'
+                                            * changes on com.mypil.usermgmt.domain.entities.UserRoleEntity/31 :
+                                              - 'updatedDate' changed: 'Mon Nov 27 08:59:53 SGT 2023' -> 'Mon Nov 27 09:32:39 SGT 2023']
+                                                                                    """)
+                    }, mediaType = MediaType.APPLICATION_JSON_VALUE)),
+            @ApiResponse(responseCode = "400", description = "Booking not found",
+                    content = @Content)})
+    @Operation(summary = "Retrieve changes made to booking along its child entities. Default number of commits is at 10",
+            description = "Retrieve changes made to booking along its child entities. Default number of commits is at 10",
+            tags = {"Audit"})
+    @GetMapping("/getBookingCommitsById/{id}")
+    public ResponseEntity<?> getBookingCommitsById(
+            @PathVariable Long id, @RequestParam(required = false, value = "limit", defaultValue = "10") Integer limit) {
+
+        log.info("Getting changes for booking with id: {}", id);
 
         /* Get Booking entity */
-        JqlQuery bookingJqlQuery = QueryBuilder.byInstanceId(id, BookingEntity.class)
-                .withChildValueObjects().build();
-        Changes bookingChanges = javers.findChanges(bookingJqlQuery);
+        Optional<BookingEntity> registrationEntity = bookingRepository.findById(id);
+        if (registrationEntity.isPresent()) {
+            LinkedList<Change> changes = new LinkedList<>();
 
-        log.info("bookingChanges: {}\n", bookingChanges.prettyPrint());
-
-        LinkedList<Change> changes = new LinkedList<>(bookingChanges);
-        bookingRepository.findById(id).ifPresent(bookingEntity -> {
+            getEntityChanges(QueryBuilder.byInstanceId(registrationEntity.get().getId(), BookingEntity.class), changes);
 
             /* Get contract entity changes */
-            if (ObjectUtils.isNotEmpty(bookingEntity.getContracts())) {
-                bookingEntity.getContracts().forEach(contractEntity -> {
-                    JqlQuery contractJqlQuery = QueryBuilder.byInstanceId(contractEntity.getId(), ContractEntity.class).withChildValueObjects().build();
-                    Changes contractChanges = javers.findChanges(contractJqlQuery);
-                    log.info("contractChanges: {}\n", contractChanges.prettyPrint());
-                    changes.addAll(contractChanges);
+            if (ObjectUtils.isNotEmpty(registrationEntity.get().getContracts())) {
+                registrationEntity.get().getContracts().forEach(entity -> {
+                    getEntityChanges(QueryBuilder.byInstanceId(entity.getId(), ContractEntity.class), changes);
                 });
             }
 
-            /* Get contract entity changes */
-
-            if (ObjectUtils.isNotEmpty(bookingEntity.getContacts())) {
-                bookingEntity.getContacts().forEach(contactEntity -> {
-                    JqlQuery contactJqlQuery = QueryBuilder.byInstanceId(contactEntity.getId(), ContactEntity.class).withChildValueObjects().build();
-                    Changes contactChanges = javers.findChanges(contactJqlQuery);
-                    log.info("contactChanges: {}\n", contactChanges.prettyPrint());
-                    changes.addAll(contactChanges);
+            /* Get contact entity changes */
+            if (ObjectUtils.isNotEmpty(registrationEntity.get().getContacts())) {
+                registrationEntity.get().getContacts().forEach(entity -> {
+                    getEntityChanges(QueryBuilder.byInstanceId(entity.getId(), ContactEntity.class), changes);
                 });
             }
-        });
-        log.info("changes: {}\n", changes);
+            if (CollectionUtils.isEmpty(changes)) {
+                return ResponseEntity.ok().body("No changes found for booking with id: " + id);
+            }
+            /* Create Changes from the added changes while limit number of commits. default limit is 10  */
+            List<ChangesByCommit> changesByCommits = new Changes(
+                    changes, new PrettyValuePrinter(
+                    new JaversCoreProperties.PrettyPrintDateFormats()))
+                    .groupByCommit().stream().limit(limit).toList();
 
-        /* Create Changes from the added changes while reverse sort by commit order  */
-         bookingChanges = changes.stream()
-                .filter(change -> change.getCommitMetadata().isPresent())
-                .sorted(Comparator.comparing(
-                        i -> i.getCommitMetadata().get().getId(),
-                        Comparator.comparing(CommitId::getMajorId).reversed()))
-                .collect(Collectors.collectingAndThen(Collectors.toList(),
-                        sortedList -> new Changes(sortedList, new PrettyValuePrinter(new JaversCoreProperties.PrettyPrintDateFormats()))));
+            /* Alternative way to create Changes. This is being customizable to fine-tune your structure, while the above doesn't. */
+            Changes collect = changes.stream()
+                    .filter(change -> change.getCommitMetadata().isPresent())
+                    .sorted(Comparator.comparing(
+                            i -> i.getCommitMetadata().get().getId(),
+                            Comparator.comparing(CommitId::getMajorId).reversed()))
+                    .collect(Collectors.collectingAndThen(Collectors.toList(),
+                            sortedList -> new Changes(sortedList, new PrettyValuePrinter(
+                                    new JaversCoreProperties.PrettyPrintDateFormats()))));
 
-        log.info("combinedChanges: {}\n", bookingChanges.prettyPrint());
-
-        return ResponseEntity.ok().body("<pre>" + bookingChanges.prettyPrint());
-    }
-
-    @GetMapping("/booking/snapshots")
-    public String getBookingEntitySnapshots() {
-        QueryBuilder jqlQuery = QueryBuilder.byClass(BookingEntity.class);
-        List<CdoSnapshot> changes = new ArrayList(javers.findSnapshots(jqlQuery.build()));
-
-        changes.sort((o1, o2) -> -1 * o1.getCommitMetadata().getCommitDate().compareTo(o2.getCommitMetadata().getCommitDate()));
-
-        JsonConverter jsonConverter = javers.getJsonConverter();
-        return jsonConverter.toJson(changes);
+            return ResponseEntity.ok().body(collect.prettyPrint());
+        }
+        return ResponseEntity.ok().body("No changes found for booking with id: " + id);
     }
 
     @GetMapping("/getShadowsWithScopeDeepPlusQuery")
@@ -173,5 +197,12 @@ public class AuditController {
         Class<?> className = Class.forName("com.example.userregistration.entity." + entityClass);
         log.info("className: {}", className.getName());
         return javersService.getShadowsWithShadowScopeQuery(id, className, page, pageSize, isNextRecordRequired);
+    }
+
+    private void getEntityChanges(QueryBuilder contractEntity, LinkedList<Change> changes) {
+        JqlQuery contractJqlQuery = contractEntity
+                .withChildValueObjects().build();
+        Changes contractChanges = javers.findChanges(contractJqlQuery);
+        changes.addAll(contractChanges);
     }
 }
