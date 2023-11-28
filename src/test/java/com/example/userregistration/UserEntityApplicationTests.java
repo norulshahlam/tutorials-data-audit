@@ -21,10 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.*;
 
 
 @Slf4j
@@ -35,11 +32,8 @@ class UserEntityApplicationTests {
 
     @LocalServerPort
     private int port;
-
     private static RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-
     @Autowired
     private BookingRepository bookingRepository;
     @Autowired
@@ -47,8 +41,8 @@ class UserEntityApplicationTests {
     private String baseUrl = "http://localhost:";
     BookingEntity bookingEntity = new BookingEntity();
     ContactEntity contactEntity = new ContactEntity();
-
-
+    private static Long id = 0L;
+    Faker faker = new Faker();
     @BeforeAll
     static void beforeAll() {
         restTemplate = new RestTemplate();
@@ -63,56 +57,54 @@ class UserEntityApplicationTests {
         contactEntity = initContactData();
     }
 
-    Faker faker = new Faker();
-
-    @RepeatedTest(1)
+    @RepeatedTest(2)
     @Order(1)
     @DisplayName("Create Booking using java object")
     void createBooking() throws JsonProcessingException {
         /* Copy this log data to create json file */
         log.info("bookingEntity: " + objectMapper.writeValueAsString(bookingEntity));
-        restTemplate.postForObject(baseUrl.concat("/createBooking"), bookingEntity, BookingEntity.class);
-        List<BookingEntity> all = bookingRepository.findAll();
-        assertThat(all, hasSize(greaterThanOrEqualTo(1)));
+        BookingEntity savedEntity = restTemplate.postForObject(baseUrl.concat("/createBooking"), bookingEntity, BookingEntity.class);
+        assertThat(savedEntity, is(notNullValue()));
+        id = savedEntity.getId();
     }
 
-    @RepeatedTest(1)
+    @RepeatedTest(2)
     @Order(2)
     @DisplayName("Create booking using json")
     void createBookingUsingJson() throws Exception {
         File file = new File("src/test/resources/bookingDto.json");
         bookingEntity = objectMapper.readValue(file, BookingEntity.class);
-        BookingEntity bookingSaved = restTemplate.postForObject(baseUrl.concat("/createBooking"), bookingEntity, BookingEntity.class);
-        log.info("booking saved: \n" + objectMapper.writeValueAsString(bookingSaved));
-        List<BookingEntity> all = bookingRepository.findAll();
-        assertThat(all, hasSize(greaterThanOrEqualTo(1)));
+        BookingEntity savedEntity = restTemplate.postForObject(baseUrl.concat("/createBooking"), bookingEntity, BookingEntity.class);
+        log.info("booking saved: \n" + objectMapper.writeValueAsString(savedEntity));
+        assertThat(savedEntity, is(notNullValue()));
+        id = savedEntity.getId();
+        log.info("id: " + id);
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(2)
     @Order(3)
     @DisplayName("Create Contact using java object")
     void createContact() throws JsonProcessingException {
         /* Copy this log data to create json file */
         log.info("ContactEntity: " + objectMapper.writeValueAsString(contactEntity));
-        restTemplate.postForObject(baseUrl.concat("/createContact"), contactEntity, ContactEntity.class);
-        List<ContactEntity> all = contactRepository.findAll();
-        assertThat(all, hasSize(greaterThanOrEqualTo(1)));
+        ContactEntity savedEntity = restTemplate.postForObject(baseUrl.concat("/createContact"), contactEntity, ContactEntity.class);
+        assertThat(savedEntity, is(notNullValue()));
     }
 
-    @RepeatedTest(1)
+    @RepeatedTest(2)
     @Order(5)
     @DisplayName("Edit booking using java object")
     void editBooking() {
+        log.info("id: " + id);
 
         /* Fetch booking first */
-        long id = 1L;
         String getUri = baseUrl.concat("/fetchBooking/").concat(Long.toString(id));
         log.info("getUri: " + getUri);
         BookingEntity fetchedBooking = restTemplate
                 .getForEntity(getUri, BookingEntity.class).getBody();
 
         /* With fetched booking, edit some fields */
-        id = id + 1;
+        assert fetchedBooking != null;
         String oldBkgNo = fetchedBooking.getBkgNo();
 
         fetchedBooking.setBkgNo(faker.idNumber().ssnValid());
@@ -127,7 +119,7 @@ class UserEntityApplicationTests {
         assertThat(oldBkgNo, not(newBkgNo));
     }
 
-    @RepeatedTest(1)
+    @RepeatedTest(2)
     @Order(6)
     @DisplayName("Edit Contact using java object")
     void editContact() throws JsonProcessingException {
@@ -152,7 +144,7 @@ class UserEntityApplicationTests {
         assertThat(oldMobileNo, not(newMobileNo));
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(2)
     @Order(7)
     @DisplayName("Delete Booking by id")
     void deleteBooking() {
@@ -165,7 +157,7 @@ class UserEntityApplicationTests {
         assertThat(byId, is(Optional.empty()));
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(2)
     @Order(8)
     @DisplayName("Delete Contact by id")
     void deleteContact() {

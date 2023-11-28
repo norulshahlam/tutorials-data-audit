@@ -7,6 +7,7 @@ import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.service.JaversService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -94,7 +95,7 @@ public class AuditController {
     }
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Bad Request",
+            @ApiResponse(responseCode = "200", description = "Changes found",
                     content = @Content(examples = {
                             @ExampleObject(name = "Changes found",
                                     summary = "Changes found",
@@ -102,30 +103,35 @@ public class AuditController {
                                     value = """
                                             [Commit 43.00 done by anonymousUser at 27 Nov 2023, 09:34:12 :
                                             * changes on com.mypil.usermgmt.domain.entities.CompanyEntity/18 :
-                                              - 'updatedDate' changed: 'Mon Nov 27 09:32:39 SGT 2023' -> 'Mon Nov 27 09:34:12 SGT 2023'
+                                            - 'updatedDate' changed: 'Mon Nov 27 09:32:39 SGT 2023' -> 'Mon Nov 27 09:34:12 SGT 2023'
                                             * changes on com.mypil.usermgmt.domain.entities.UserRegistrationEntity/64 :
-                                              - 'updatedDate' changed: 'Mon Nov 27 09:32:39 SGT 2023' -> 'Mon Nov 27 09:34:12 SGT 2023'
+                                            - 'updatedDate' changed: 'Mon Nov 27 09:32:39 SGT 2023' -> 'Mon Nov 27 09:34:12 SGT 2023'
                                             * changes on com.mypil.usermgmt.domain.entities.UserRoleEntity/31 :
-                                              - 'roleCode' changed: 'Bill To Party' -> 'Bill To 11'
-                                              - 'updatedDate' changed: 'Mon Nov 27 09:32:39 SGT 2023' -> 'Mon Nov 27 09:34:12 SGT 2023'
+                                            - 'roleCode' changed: 'Bill To Party' -> 'Bill To 11'
+                                            - 'updatedDate' changed: 'Mon Nov 27 09:32:39 SGT 2023' -> 'Mon Nov 27 09:34:12 SGT 2023'
                                             , Commit 42.00 done by anonymousUser at 27 Nov 2023, 09:32:39 :
                                             * changes on com.mypil.usermgmt.domain.entities.CompanyEntity/18 :
-                                              - 'updatedDate' changed: 'Mon Nov 27 08:59:53 SGT 2023' -> 'Mon Nov 27 09:32:39 SGT 2023'
+                                            - 'updatedDate' changed: 'Mon Nov 27 08:59:53 SGT 2023' -> 'Mon Nov 27 09:32:39 SGT 2023'
                                             * changes on com.mypil.usermgmt.domain.entities.UserRegistrationEntity/64 :
-                                              - 'firstName' changed: 'ss' -> '59ujkyv'
-                                              - 'updatedDate' changed: 'Mon Nov 27 08:59:53 SGT 2023' -> 'Mon Nov 27 09:32:39 SGT 2023'
+                                            - 'firstName' changed: 'ss' -> '59ujkyv'
+                                            - 'updatedDate' changed: 'Mon Nov 27 08:59:53 SGT 2023' -> 'Mon Nov 27 09:32:39 SGT 2023'
                                             * changes on com.mypil.usermgmt.domain.entities.UserRoleEntity/31 :
-                                              - 'updatedDate' changed: 'Mon Nov 27 08:59:53 SGT 2023' -> 'Mon Nov 27 09:32:39 SGT 2023']
-                                                                                    """)
-                    }, mediaType = MediaType.APPLICATION_JSON_VALUE)),
+                                            - 'updatedDate' changed: 'Mon Nov 27 08:59:53 SGT 2023' -> 'Mon Nov 27 09:32:39 SGT 2023']
+                                            """)
+                    }, mediaType = MediaType.TEXT_PLAIN_VALUE)),
             @ApiResponse(responseCode = "400", description = "Booking not found",
+                    content = @Content),
+            @ApiResponse(responseCode = "201", description = "No changes found",
                     content = @Content)})
-    @Operation(summary = "Retrieve changes made to booking along its child entities. Default number of commits is at 10",
-            description = "Retrieve changes made to booking along its child entities. Default number of commits is at 10",
+    @Operation(summary = "Retrieve changes made to booking along its child entities. Default number of change commits is at 10",
+            description = "Retrieve changes made to booking along its child entities. Default number of change commits is at 10",
             tags = {"Audit"})
     @GetMapping("/getBookingCommitsById/{id}")
     public ResponseEntity<?> getBookingCommitsById(
-            @PathVariable Long id, @RequestParam(required = false, value = "limit", defaultValue = "10") Integer limit) {
+            @PathVariable Long id,
+            @RequestParam(required = false, value = "limit", defaultValue = "10")
+            @Parameter(description = "limit number of change commits. Default is 10 or lesser if total commit is less than 10",
+                    name = "limit") Integer limit) {
 
         log.info("Getting changes for booking with id: {}", id);
 
@@ -158,7 +164,8 @@ public class AuditController {
                     new JaversCoreProperties.PrettyPrintDateFormats()))
                     .groupByCommit().stream().limit(limit).toList();
 
-            /* Alternative way to create Changes. This is being customizable to fine-tune your structure, while the above doesn't. */
+            /* Alternative way to create Changes.
+            This can be customized to fine-tune your custom structure, while the above doesn't. */
             Changes collect = changes.stream()
                     .filter(change -> change.getCommitMetadata().isPresent())
                     .sorted(Comparator.comparing(
