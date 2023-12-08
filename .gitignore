@@ -36,3 +36,5 @@ build/
 .vscode/
 /booking-service-log/
 /logs/
+/appmap.yml
+/tmp/**
