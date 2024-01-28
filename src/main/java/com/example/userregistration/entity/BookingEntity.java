@@ -19,7 +19,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "BOOKING")
-public class BookingEntity extends AuditEntity implements Serializable {
+public class BookingEntity implements Serializable {
 
     public static final long serialVersionId = 1L;
 

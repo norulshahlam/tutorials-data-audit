@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Builder
 @Entity
 @Table(name = "CONTACT")
-public class ContactEntity extends AuditEntity implements Serializable {
+public class ContactEntity implements Serializable {
 
     public static final long serialVersionId = 1L;
 

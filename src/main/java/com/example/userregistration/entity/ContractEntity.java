@@ -15,7 +15,7 @@ import java.io.Serializable;
 
 @Data
 @Table(name = "CONTRACT")
-public class ContractEntity extends AuditEntity implements Serializable {
+public class ContractEntity implements Serializable {
 
     public static final long serialVersionId = 1L;
 

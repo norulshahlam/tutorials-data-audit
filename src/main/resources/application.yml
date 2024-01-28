@@ -22,6 +22,9 @@ spring:
       hibernate:
         format_sql: true
         ddl-auto: create
+  output:
+    ansi:
+      enabled: always
   sql:
     init:
       mode: always

@@ -1,0 +1,154 @@
+<configuration>
+
+    <!-- Using variables from property file  -->
+    <springProperty name="appName" source="spring.application.name"  defaultValue="default-name"/>
+    <springProperty name="profile" source="spring.profiles.active"  defaultValue="default-profile"/>
+    <!--  where logs is saved  -->
+    <property name="LOGS" value="./logs"/>
+    <!--  your console output  -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%cyan(%d{dd-MMM-yyyy E HH:mm:ss.SSS}) %green([${appName}]) %blue([${profile}]) %yellow([%t]) %highlight(%-5level) %magenta(%logger{10}) - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!--  your saved logs  -->
+    <appender name="APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/logger.log</file>
+        <encoder>
+            <pattern>>%cyan(%d{dd-MMM-yyyy E HH:mm:ss.SSS}) %green([${appName}]) %blue([${profile}]) %yellow([%t]) %highlight(%-5level) %magenta(%logger{10}) - %msg%n
+            </pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS}/${appName}/${profile}/logger-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>20MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+    </appender>
+
+    <root name="com.mypil" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </root>
+
+    <logger name="com.mypil" level="info" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="jdk.event.security" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="com.zaxxer.hikari" level="off">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.kafka.clients.NetworkClient" level="error">
+    <appender-ref ref="STDOUT"/>
+    <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.kafka.clients.ClientUtils" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.kafka.clients.FetchSessionHandler" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.kafka.clients.Metadata" level="error">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.kafka.clients.consumer.KafkaConsumer" level="info">
+    <appender-ref ref="STDOUT"/>
+    <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.kafka.clients.consumer.internals.ConsumerCoordinator" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.kafka.clients.consumer.internals.Fetcher" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.kafka.clients.consumer.internals.ConsumerNetworkClient" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.kafka.common.security.authenticator.SaslClientAuthenticator" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.kafka.common.network.Selector" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.kafka.common.network.SslTransportLayer" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.coyote" level="error">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.tomcat" level="error">
+    <appender-ref ref="STDOUT"/>
+    <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.apache.catalina" level="error">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.catalina.coyote" level="error">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="org.tomcat.coyote" level="error">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="reactor.netty.transport" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="reactor.netty.http" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="reactor.netty.resources" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="reactor.netty.tcp" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="io.netty.resolver" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="io.netty.handler" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="io.netty.util" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="io.netty.channel" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="io.netty.buffer" level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+    <logger name="com.p6spy" level="info" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APPENDER"/>
+    </logger>
+
+</configuration>
