@@ -13,11 +13,13 @@ management:
     env:
       enabled: true
 spring:
+  application:
+    name: user-reg
   datasource:
     initialization-mode: always
   jpa:
     generate-ddl: true
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
