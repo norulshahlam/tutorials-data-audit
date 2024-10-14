@@ -14,7 +14,7 @@ management:
       enabled: true
 spring:
   application:
-    name: user-reg
+    name: audit-tutorial
   datasource:
     initialization-mode: always
   jpa:
