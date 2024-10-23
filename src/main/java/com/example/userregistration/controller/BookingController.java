@@ -67,19 +67,6 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.OK).body(booking);
     }
 
-
-    @ApiResponse(responseCode = "200", description = "Booking fetched",
-            content = @Content(mediaType = "application/json"))
-    @Operation(summary = "Fetch booking",
-            description = "This endpoint will Fetch booking based on id")
-    @GetMapping("fetchBookingByBkgRqstNo/{bkgRqstNo}")
-    public ResponseEntity<BookingEntity> fetchBookingByBkgRqstNo(@PathVariable String bkgRqstNo) {
-
-        log.info("in BookingController::fetchBooking");
-        BookingEntity booking = service.fetchBookingByBkgRqstNo(bkgRqstNo);
-        return ResponseEntity.status(HttpStatus.OK).body(booking);
-    }
-
     @ApiResponse(responseCode = "200", description = "Booking edited",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Edit existing user",

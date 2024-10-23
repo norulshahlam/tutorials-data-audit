@@ -2,7 +2,6 @@ package com.example.userregistration;
 
 import com.example.userregistration.entity.BookingEntity;
 import com.example.userregistration.entity.ContactEntity;
-import com.example.userregistration.entity.ContractEntity;
 import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.repository.ContactRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;

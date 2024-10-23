@@ -42,10 +42,6 @@ public class BookingEntity implements Serializable {
     @Column(name = "BKG_NO"/*, nullable = false*/)
     private String bkgNo;
 
-    @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinColumn(name = "bookingId", referencedColumnName = "id")
-    private List<ContractEntity> contracts = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

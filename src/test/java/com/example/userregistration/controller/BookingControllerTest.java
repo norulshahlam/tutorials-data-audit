@@ -2,7 +2,6 @@ package com.example.userregistration.controller;
 
 import com.example.userregistration.entity.BookingEntity;
 import com.example.userregistration.entity.ContactEntity;
-import com.example.userregistration.entity.ContractEntity;
 import com.example.userregistration.service.BookingService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;

@@ -70,9 +70,6 @@ public class BookingServiceImpl implements BookingService {
         bookingEntity.setBkgRqstStatusSeq(booking.getBkgRqstStatusSeq());
         bookingEntity.setBkgNo(booking.getBkgNo());
 
-        bookingEntity.getContracts().clear();
-        bookingEntity.getContracts().addAll(booking.getContracts());
-
         bookingEntity.getContacts().clear();
         bookingEntity.getContacts().addAll(booking.getContacts());
 

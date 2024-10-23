@@ -2,7 +2,6 @@ package com.example.userregistration.controller;
 
 import com.example.userregistration.entity.BookingEntity;
 import com.example.userregistration.entity.ContactEntity;
-import com.example.userregistration.entity.ContractEntity;
 import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.service.JaversService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -77,10 +76,10 @@ public class AuditController {
         return ResponseEntity.ok().body(changes.prettyPrint());
     }
 
-    @GetMapping("/contractsPretty/{id}")
+    @GetMapping("/contactsPretty/{id}")
     public ResponseEntity<String> getContractEntityChangesPretty(
             @PathVariable Long id) {
-        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, ContractEntity.class);
+        QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
         log.info("changes: {}\n", changes);
         return ResponseEntity.ok().body("<pre>" + changes.prettyPrint());
@@ -142,12 +141,6 @@ public class AuditController {
 
             getEntityChanges(QueryBuilder.byInstanceId(registrationEntity.get().getId(), BookingEntity.class), changes);
 
-            /* Get contract entity changes */
-            if (ObjectUtils.isNotEmpty(registrationEntity.get().getContracts())) {
-                registrationEntity.get().getContracts().forEach(entity -> {
-                    getEntityChanges(QueryBuilder.byInstanceId(entity.getId(), ContractEntity.class), changes);
-                });
-            }
 
             /* Get contact entity changes */
             if (ObjectUtils.isNotEmpty(registrationEntity.get().getContacts())) {
