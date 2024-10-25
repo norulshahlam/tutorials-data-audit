@@ -63,7 +63,7 @@ public class AuditController {
     public ResponseEntity<String> getBookingEntityChangesPretty() {
         QueryBuilder jqlQuery = QueryBuilder.byClass(BookingEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
-        return ResponseEntity.ok().body("<pre>" + changes.prettyPrint() + "</pre>");
+        return ResponseEntity.ok().body(changes.prettyPrint() + "</pre>");
     }
 
     @GetMapping("/bookingPretty/{id}")
@@ -82,7 +82,7 @@ public class AuditController {
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
         log.info("changes: {}\n", changes);
-        return ResponseEntity.ok().body("<pre>" + changes.prettyPrint());
+        return ResponseEntity.ok().body(changes.prettyPrint());
     }
 
     @GetMapping("/allPretty")
@@ -90,7 +90,7 @@ public class AuditController {
         QueryBuilder jqlQuery = QueryBuilder.anyDomainObject();
         Changes changes = javers.findChanges(jqlQuery.build());
         log.info("changes: {}\n", changes);
-        return ResponseEntity.ok().body("<pre>" + changes.groupByCommit());
+        return ResponseEntity.ok().body(changes.groupByCommit().toString());
     }
 
     @ApiResponses(value = {
