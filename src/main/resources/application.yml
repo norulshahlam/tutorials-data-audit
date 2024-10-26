@@ -17,6 +17,14 @@ spring:
     name: audit-tutorial
   datasource:
     initialization-mode: always
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:audittable;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
   jpa:
     generate-ddl: true
     show-sql: false

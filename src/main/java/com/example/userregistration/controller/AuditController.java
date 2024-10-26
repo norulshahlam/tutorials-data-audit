@@ -89,8 +89,9 @@ public class AuditController {
     public ResponseEntity<String> getAllEntityChangesPretty() {
         QueryBuilder jqlQuery = QueryBuilder.anyDomainObject();
         Changes changes = javers.findChanges(jqlQuery.build());
-        log.info("changes: {}\n", changes);
-        return ResponseEntity.ok().body(changes.groupByCommit().toString());
+        String changed = changes.groupByCommit().toString();
+        log.info("changes: {}\n", changed);
+        return ResponseEntity.ok().body(changed);
     }
 
     @ApiResponses(value = {
