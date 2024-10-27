@@ -141,7 +141,6 @@ public class BookingServiceImpl implements BookingService {
 
             BeanUtils.copyProperties(contact, contactEntity, "id");
 
-
             return contactRepository.save(contactEntity);
         }
         throw new NoResultException("Contact to be edited not found");

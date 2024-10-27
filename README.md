@@ -8,7 +8,8 @@
 ### Download swagger specifications
     http://localhost:8080/v3/api-docs.yaml
 
-### Access h2 console
+### Access table via Access h2 console
 
-    http://localhost:8080/h2-console
-    JDBC URL: jdbc:h2:mem:audittable
+    http://localhost:8080/h2-console  
+    JDBC URL: jdbc:h2:mem:audittable  
+    SELECT * FROM JV_SNAPSHOT  
