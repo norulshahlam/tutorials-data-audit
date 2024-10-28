@@ -1,24 +1,26 @@
-# User Registration module
+# Data auditing 
 
 ## This is a tutorial for auditing using [Javers](https://javers.org/documentation/jql-examples/)
 
-### Swagger url
+## There is booking entity which contains contact entity. Add either one first, then edit or delete using Swagger
+
+## Swagger url
     http://localhost:8080/swagger-ui/index.html
 
-### Download swagger specifications
+## Download swagger specifications
     http://localhost:8080/v3/api-docs.yaml
 
-### Access table via Access h2 console
+## Access table via Access h2 console
 
     http://localhost:8080/h2-console  
     JDBC URL: jdbc:h2:mem:audittable  
     SELECT * FROM JV_SNAPSHOT  
 
-## For direct DB audit data
+### For direct DB audit data
 
     SELECT commit_id,  version, g.local_id as "id",  author, type, state, changed_properties, managed_type, commit_date FROM jv_snapshot INNER JOIN jv_commit ON commit_pk = commit_fk INNER JOIN jv_global_id g ON g.global_id_pk = global_id_fk LEFT OUTER JOIN jv_global_id o ON o.global_id_pk = g.owner_id_fk WHERE 1 = 1 ORDER BY g.local_id
 
-### How to clean up snapshots and commits after a period of time in Javers?
+## How to clean up snapshots and commits after a period of time in Javers?
 
 Clean up can be done in the following order:
 
