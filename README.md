@@ -2,7 +2,7 @@
 
 ## This is a tutorial for auditing using [Javers](https://javers.org/documentation/jql-examples/)
 
-## There is booking entity which contains contact entity. Add either one first, then edit or delete using Swagger
+## There is booking entity that contains contact entity. Add either one first, then edit or delete using Swagger
 
 ## Swagger url
     http://localhost:8080/swagger-ui/index.html
