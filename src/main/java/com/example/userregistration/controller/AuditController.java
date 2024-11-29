@@ -82,7 +82,33 @@ public class AuditController {
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
         log.info("changes: {}\n", changes);
+
+        mappLogDetails(changes);
         return ResponseEntity.ok().body(changes.prettyPrint());
+    }
+
+    private void mapLogDetails(Changes changes) {
+        List<CommitId> commitIds = changes.groupByCommit().keySet().stream()
+               .sorted(Comparator.comparing(CommitId::getCommitSequence))
+               .collect(Collectors.toList());
+
+        for (CommitId commitId : commitIds) {
+            List<Change> changesForCommit = changes.getChangesForCommit(commitId);
+
+            for (Change change : changesForCommit) {
+                String className = change.getAffectedObject().getType().getName();
+                Long id = (Long) change.getAffectedObject().getId();
+                String fieldName = change.getPropertyName();
+                Object newValue = change.getNewValue();
+                Object oldValue = change.getOldValue();
+
+                if (ObjectUtils.notEqual(oldValue, newValue)) {
+                    log.info("Commit: {}, Class: {}, Id: {}, Field: {}, Old Value: {}, New Value: {}",
+                            commitId, className, id, fieldName, oldValue, newValue);
+                }
+            }
+        }
+
     }
 
     @GetMapping("/allPretty")
