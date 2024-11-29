@@ -2,6 +2,7 @@ package com.example.userregistration.controller;
 
 import com.example.userregistration.entity.BookingEntity;
 import com.example.userregistration.entity.ContactEntity;
+import com.example.userregistration.model.AudiMapped;
 import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.service.JaversService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -83,11 +84,15 @@ public class AuditController {
         Changes changes = javers.findChanges(jqlQuery.build());
         log.info("changes: {}\n", changes);
 
-        mappLogDetails(changes);
+        mapLogDetails(changes);
         return ResponseEntity.ok().body(changes.prettyPrint());
     }
 
+
+
     private void mapLogDetails(Changes changes) {
+
+        AudiMapped a;
         List<CommitId> commitIds = changes.groupByCommit().keySet().stream()
                .sorted(Comparator.comparing(CommitId::getCommitSequence))
                .collect(Collectors.toList());
