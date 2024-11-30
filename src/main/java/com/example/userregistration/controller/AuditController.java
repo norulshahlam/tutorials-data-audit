@@ -66,6 +66,8 @@ public class AuditController {
     }
 
     @GetMapping("/bookingPretty/{id}")
+    @Operation(summary = "Get booking audit by ID",
+            description = "This endpoint will Get booking audit by ID")
     public ResponseEntity<String> getBookingEntityChangesPrettyWithChildById(
             @PathVariable Long id) {
         JqlQuery jqlQuery = QueryBuilder.byInstanceId(id, BookingEntity.class)
@@ -76,9 +78,23 @@ public class AuditController {
     }
 
     @GetMapping("/contactsPretty/{id}")
-    public ResponseEntity<String> getContractEntityChangesPretty(
+    @Operation(summary = "Get contact audit by ID",
+            description = "This endpoint will Get contact audit by ID")
+    public ResponseEntity<String> getContractEntityChangesPrettyById(
             @PathVariable Long id) {
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, ContactEntity.class);
+        Changes changes = javers.findChanges(jqlQuery.build());
+
+        List<ChangesByCommit> changesByCommits = changes.groupByCommit();
+        log.info("changesByCommits: {}\n", changesByCommits);
+        return ResponseEntity.ok().body(changes.prettyPrint());
+    }
+
+    @GetMapping("/contactsPretty")
+    @Operation(summary = "Get all contact audit",
+            description = "This endpoint will Get all contact audit")
+    public ResponseEntity<String> getContractEntityChangesPrettyAll() {
+        QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
 
         List<ChangesByCommit> changesByCommits = changes.groupByCommit();
