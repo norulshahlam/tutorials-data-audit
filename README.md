@@ -42,7 +42,7 @@
 ## Added table for custom audit mapping
 Run the endpoint first and it will save for you your custom audit mapping.
 
-    SELECT * FROM AUDIT_MAPPED order by commit_date
+    SELECT * FROM AUDIT_MAPPED order by commit_date desc
 
 ## How to clean up snapshots and commits after a period of time in Javers?
 

@@ -41,7 +41,7 @@ public class TutorialsDataAuditApplication implements CommandLineRunner {
 
         ContactEntity contactEntity1 = ContactEntity.builder()
                 .name("John Doe")
-                .email("www@abc2.com")
+                .email("www@xyz.com")
                 .mobileNo("9221215222")
                 .build();
 
@@ -50,10 +50,10 @@ public class TutorialsDataAuditApplication implements CommandLineRunner {
         log.info("Editing 2 existing contact..");
 
         savedContacts.get(0).setName("Tutorials2");
-        savedContacts.get(0).setEmail("www.abc.abc2");
+        savedContacts.get(0).setEmail("www@abc.com2");
 
-        savedContacts.get(1).setName("Tutorials3");
-        savedContacts.get(1).setEmail("www.abc.abc3");
+        savedContacts.get(1).setName("John Doe2");
+        savedContacts.get(1).setEmail("www@xyz.com2");
 
         List<ContactEntity> editedContacts = contactRepository.saveAll(savedContacts);
 

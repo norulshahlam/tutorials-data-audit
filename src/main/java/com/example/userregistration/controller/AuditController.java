@@ -99,9 +99,12 @@ public class AuditController {
         QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
 
-        List<AuditMapped> mappedList = mapLogDetails(changes);
-        mappedList.forEach(i -> log.info("mappedList: \n{}", i));
-        return ResponseEntity.ok().body(mappedList);
+        if (!changes.isEmpty()) {
+            List<AuditMapped> mappedList = customizeAuditDetails(changes);
+            mappedList.forEach(i -> log.info("mappedList: \n{}", i));
+            return ResponseEntity.ok().body(mappedList);
+        }
+        return ResponseEntity.ok(new ArrayList<>());
     }
 
 
@@ -226,7 +229,7 @@ public class AuditController {
         changes.addAll(contractChanges);
     }
 
-    private List<AuditMapped> mapLogDetails(Changes changes) {
+    private List<AuditMapped> customizeAuditDetails(Changes changes) {
         List<AuditMapped> mappedList = new ArrayList<>();
         changes.forEach(j -> {
             System.out.println("Type j: " + j.getClass().getName());
