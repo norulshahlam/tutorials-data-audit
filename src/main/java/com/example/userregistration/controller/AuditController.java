@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping(value = "/audit")
@@ -107,18 +108,27 @@ public class AuditController {
 
     private void mapLogDetails(Changes changes) {
         List<AudiMapped> mappedList = new ArrayList<>();
-        changes.forEach(i -> {
+        changes.forEach(j -> {
 
-            AudiMapped.builder()
-                    .author(i.getCommitMetadata().get().getAuthor())
-                    .commitId(BigInteger.valueOf(i.getCommitMetadata().get().getId().getMajorId()))
-                    .id(Integer.valueOf(i.getAffectedLocalId().toString()))
-                    .commitDate(i.getCommitMetadata().get().getCommitDate())
-                    .build();
+            System.out.println("Type j: " + j.getClass().getName());
 
+            if (Stream.of("TerminalValueChange", "InitialValueChange").noneMatch(i -> i.equals(j.getClass().getName())) && j.getCommitMetadata().isPresent()) {
+                AudiMapped mapped = AudiMapped.builder()
+                        .commitId(BigInteger.valueOf(j.getCommitMetadata().get().getId().getMajorId()))
+                        .commitDate(j.getCommitMetadata().get().getCommitDate())
+                        .id(Integer.valueOf(j.getAffectedLocalId().toString()))
+                        .author(j.getCommitMetadata().get().getAuthor())
+                        .type(j.getClass().getName())
+                        .build();
+                if (j.getClass().getName().equals("ValueChange")) {
+                    mapped.setNewValue("");
+                    mapped.setOldValue("");
+                    mapped.setFieldName("");
+                }
+                mappedList.add(mapped);
+
+            }
         });
-
-
     }
 
     @GetMapping("/allPretty")
