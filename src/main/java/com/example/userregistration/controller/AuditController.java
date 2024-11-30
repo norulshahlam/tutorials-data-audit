@@ -28,10 +28,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigInteger;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -82,37 +80,26 @@ public class AuditController {
             @PathVariable Long id) {
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
-        log.info("changes: {}\n", changes);
+        log.info("changes: {}\n", changes.groupByCommit());
 
         mapLogDetails(changes);
         return ResponseEntity.ok().body(changes.prettyPrint());
     }
 
 
-
     private void mapLogDetails(Changes changes) {
+        List<AudiMapped> mappedList = new ArrayList<>();
+        changes.groupByCommit().forEach(i -> {
+            List<Change> singleCommit = i.get();
+            singleCommit.forEach(j -> {
 
-        AudiMapped a;
-        List<CommitId> commitIds = changes.groupByCommit().keySet().stream()
-               .sorted(Comparator.comparing(CommitId::getCommitSequence))
-               .collect(Collectors.toList());
+                AudiMapped.builder()
+                        .commitId(BigInteger.valueOf(j.getCommitMetadata().get().getId().getMajorId()))
+                        .build();
+            });
 
-        for (CommitId commitId : commitIds) {
-            List<Change> changesForCommit = changes.getChangesForCommit(commitId);
+        });
 
-            for (Change change : changesForCommit) {
-                String className = change.getAffectedObject().getType().getName();
-                Long id = (Long) change.getAffectedObject().getId();
-                String fieldName = change.getPropertyName();
-                Object newValue = change.getNewValue();
-                Object oldValue = change.getOldValue();
-
-                if (ObjectUtils.notEqual(oldValue, newValue)) {
-                    log.info("Commit: {}, Class: {}, Id: {}, Field: {}, Old Value: {}, New Value: {}",
-                            commitId, className, id, fieldName, oldValue, newValue);
-                }
-            }
-        }
 
     }
 
