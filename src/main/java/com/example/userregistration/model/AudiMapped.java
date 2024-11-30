@@ -16,12 +16,13 @@ import java.time.LocalDateTime;
 public class AudiMapped {
 
     private BigInteger commitId;
+    private LocalDateTime commitDate;
     private String version;
     private Integer id;
     private String author;
     private String type;
+    private String fieldName;
     private String oldValue;
     private String newValue;
-    private LocalDateTime commitDate;
 
 }
