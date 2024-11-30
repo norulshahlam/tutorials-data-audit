@@ -39,6 +39,10 @@
     INNER JOIN
     jv_global_id g ON g.global_id_pk = s1.global_id_fk;
 
+## Added table for custom audit mapping
+Run the endpoint first and it will save for you your custom audit mapping.
+
+    SELECT * FROM AUDIT_MAPPED order by commit_date
 
 ## How to clean up snapshots and commits after a period of time in Javers?
 
