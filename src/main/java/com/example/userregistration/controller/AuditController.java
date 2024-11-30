@@ -216,7 +216,6 @@ public class AuditController {
             @RequestParam Boolean isNextRecordRequired) throws ClassNotFoundException {
 
         Class<?> className = Class.forName("com.example.userregistration.entity." + entityClass);
-        log.info("className: {}", className.getName());
         return javersService.getShadowsWithShadowScopeQuery(id, className, page, pageSize, isNextRecordRequired);
     }
 
