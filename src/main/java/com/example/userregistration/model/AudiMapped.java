@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -22,6 +22,6 @@ public class AudiMapped {
     private String type;
     private String oldValue;
     private String newValue;
-    private Date commitDate;
+    private LocalDateTime commitDate;
 
 }
