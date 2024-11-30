@@ -98,18 +98,15 @@ public class AuditController {
         QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
 
-        List<ChangesByCommit> changesByCommits = changes.groupByCommit();
-        log.info("changesByCommits: {}\n", changesByCommits);
-
-        mapLogDetails(changes);
+        List<AudiMapped> mappedList = mapLogDetails(changes);
+        log.info("mappedList: \n{}",mappedList);
         return ResponseEntity.ok().body(changes.prettyPrint());
     }
 
 
-    private void mapLogDetails(Changes changes) {
+    private List<AudiMapped> mapLogDetails(Changes changes) {
         List<AudiMapped> mappedList = new ArrayList<>();
         changes.forEach(j -> {
-
             System.out.println("Type j: " + j.getClass().getName());
 
             /* Remove unnecessary info */
@@ -136,6 +133,7 @@ public class AuditController {
                 }
             }
         });
+        return mappedList;
     }
 
     @GetMapping("/allPretty")
