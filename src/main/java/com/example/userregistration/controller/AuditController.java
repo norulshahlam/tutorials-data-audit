@@ -112,8 +112,8 @@ public class AuditController {
             System.out.println("Type j: " + j.getClass().getName());
 
             /* Remove unnecessary info */
-            if (!j.getClass().getName().contains("TerminalValueChange")
-                || !j.getClass().getName().contains("InitialValueChange")
+            if (!j.getClass().getName().equals("org.javers.core.diff.changetype.TerminalValueChange")
+                || !j.getClass().getName().equals("org.javers.core.diff.changetype.InitialValueChange")
                    && j.getCommitMetadata().isPresent()) {
                 AudiMapped mapped = AudiMapped.builder()
                         .commitId(BigInteger.valueOf(j.getCommitMetadata().get().getId().getMajorId()))
@@ -124,7 +124,7 @@ public class AuditController {
                         .build();
 
                 /* Add additional info for field changes */
-                if (j.getClass().getName().contains("ValueChange")) {
+                if (j.getClass().getName().equals("org.javers.core.diff.changetype.ValueChange")) {
                     mapped.setNewValue("");
                     mapped.setOldValue("");
                     mapped.setFieldName("");
