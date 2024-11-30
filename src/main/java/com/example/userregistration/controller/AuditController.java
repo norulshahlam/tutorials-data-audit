@@ -117,9 +117,10 @@ public class AuditController {
                     AuditMapped mapped = AuditMapped.builder()
                             .commitId(BigInteger.valueOf(j.getCommitMetadata().get().getId().getMajorId()))
                             .commitDate(j.getCommitMetadata().get().getCommitDate().toLocalDate())
+//                            .commitDate(Date.from(j.getCommitMetadata().get().getCommitDate().toInstant(ZoneOffset.UTC)))
                             .id(Integer.valueOf(j.getAffectedLocalId().toString()))
                             .author(j.getCommitMetadata().get().getAuthor())
-                            .type(type)
+                            .type(type.substring(type.lastIndexOf('.') + 1))
                             .build();
 
                     /* Add additional info for field changes */
