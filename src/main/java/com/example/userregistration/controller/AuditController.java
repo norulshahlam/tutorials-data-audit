@@ -2,7 +2,7 @@ package com.example.userregistration.controller;
 
 import com.example.userregistration.entity.BookingEntity;
 import com.example.userregistration.entity.ContactEntity;
-import com.example.userregistration.model.AudiMapped;
+import com.example.userregistration.model.AuditMapped;
 import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.service.JaversService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -94,18 +94,18 @@ public class AuditController {
     @GetMapping("/contactsPretty")
     @Operation(summary = "Get all contact audit",
             description = "This endpoint will Get all contact audit")
-    public ResponseEntity<String> getContractEntityChangesPrettyAll() {
+    public ResponseEntity<List<AuditMapped>> getContractEntityChangesPrettyAll() {
         QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
 
-        List<AudiMapped> mappedList = mapLogDetails(changes);
+        List<AuditMapped> mappedList = mapLogDetails(changes);
         log.info("mappedList: \n{}",mappedList);
-        return ResponseEntity.ok().body(changes.prettyPrint());
+        return ResponseEntity.ok().body(mappedList);
     }
 
 
-    private List<AudiMapped> mapLogDetails(Changes changes) {
-        List<AudiMapped> mappedList = new ArrayList<>();
+    private List<AuditMapped> mapLogDetails(Changes changes) {
+        List<AuditMapped> mappedList = new ArrayList<>();
         changes.forEach(j -> {
             System.out.println("Type j: " + j.getClass().getName());
 
@@ -114,9 +114,9 @@ public class AuditController {
                 String type = j.getClass().getName();
                 if (!type.equals("org.javers.core.diff.changetype.TerminalValueChange")
                     && !type.equals("org.javers.core.diff.changetype.InitialValueChange")) {
-                    AudiMapped mapped = AudiMapped.builder()
+                    AuditMapped mapped = AuditMapped.builder()
                             .commitId(BigInteger.valueOf(j.getCommitMetadata().get().getId().getMajorId()))
-                            .commitDate(j.getCommitMetadata().get().getCommitDate())
+                            .commitDate(j.getCommitMetadata().get().getCommitDate().toLocalDate())
                             .id(Integer.valueOf(j.getAffectedLocalId().toString()))
                             .author(j.getCommitMetadata().get().getAuthor())
                             .type(type)
