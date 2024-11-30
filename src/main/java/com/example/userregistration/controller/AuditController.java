@@ -112,24 +112,26 @@ public class AuditController {
             System.out.println("Type j: " + j.getClass().getName());
 
             /* Remove unnecessary info */
-            if (!j.getClass().getName().equals("org.javers.core.diff.changetype.TerminalValueChange")
-                || !j.getClass().getName().equals("org.javers.core.diff.changetype.InitialValueChange")
-                   && j.getCommitMetadata().isPresent()) {
-                AudiMapped mapped = AudiMapped.builder()
-                        .commitId(BigInteger.valueOf(j.getCommitMetadata().get().getId().getMajorId()))
-                        .commitDate(j.getCommitMetadata().get().getCommitDate())
-                        .id(Integer.valueOf(j.getAffectedLocalId().toString()))
-                        .author(j.getCommitMetadata().get().getAuthor())
-                        .type(j.getClass().getName())
-                        .build();
+            if (j.getCommitMetadata().isPresent()) {
+                String type = j.getClass().getName();
+                if (!type.equals("org.javers.core.diff.changetype.TerminalValueChange")
+                    && !type.equals("org.javers.core.diff.changetype.InitialValueChange")) {
+                    AudiMapped mapped = AudiMapped.builder()
+                            .commitId(BigInteger.valueOf(j.getCommitMetadata().get().getId().getMajorId()))
+                            .commitDate(j.getCommitMetadata().get().getCommitDate())
+                            .id(Integer.valueOf(j.getAffectedLocalId().toString()))
+                            .author(j.getCommitMetadata().get().getAuthor())
+                            .type(type)
+                            .build();
 
-                /* Add additional info for field changes */
-                if (j.getClass().getName().equals("org.javers.core.diff.changetype.ValueChange")) {
-                    mapped.setNewValue("");
-                    mapped.setOldValue("");
-                    mapped.setFieldName("");
+                    /* Add additional info for field changes */
+                    if (type.equals("org.javers.core.diff.changetype.ValueChange")) {
+                        mapped.setNewValue("");
+                        mapped.setOldValue("");
+                        mapped.setFieldName("");
+                    }
+                    mappedList.add(mapped);
                 }
-                mappedList.add(mapped);
             }
         });
     }
