@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -18,7 +18,7 @@ import java.time.LocalDate;
 public class AuditMapped {
 
     private BigInteger commitId;
-    private LocalDate commitDate;
+    private LocalDateTime commitDate;
     private String version;
     private Integer id;
     private String author;
