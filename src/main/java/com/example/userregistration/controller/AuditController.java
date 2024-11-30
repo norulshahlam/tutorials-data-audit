@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping(value = "/audit")
@@ -113,7 +112,9 @@ public class AuditController {
             System.out.println("Type j: " + j.getClass().getName());
 
             /* Remove unnecessary info */
-            if (Stream.of("TerminalValueChange", "InitialValueChange").noneMatch(i -> i.equals(j.getClass().getName())) && j.getCommitMetadata().isPresent()) {
+            if (!j.getClass().getName().contains("TerminalValueChange")
+                || !j.getClass().getName().contains("InitialValueChange")
+                   && j.getCommitMetadata().isPresent()) {
                 AudiMapped mapped = AudiMapped.builder()
                         .commitId(BigInteger.valueOf(j.getCommitMetadata().get().getId().getMajorId()))
                         .commitDate(j.getCommitMetadata().get().getCommitDate())
@@ -123,7 +124,7 @@ public class AuditController {
                         .build();
 
                 /* Add additional info for field changes */
-                if (j.getClass().getName().equals("ValueChange")) {
+                if (j.getClass().getName().contains("ValueChange")) {
                     mapped.setNewValue("");
                     mapped.setOldValue("");
                     mapped.setFieldName("");
