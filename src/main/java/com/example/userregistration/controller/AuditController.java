@@ -93,10 +93,10 @@ public class AuditController {
         List<AudiMapped> mappedList = new ArrayList<>();
         changes.forEach(i -> {
 
-i.getAffectedLocalId().toString();
             AudiMapped.builder()
                     .author(i.getCommitMetadata().get().getAuthor())
                     .commitId(BigInteger.valueOf(i.getCommitMetadata().get().getId().getMajorId()))
+                    .id(Integer.valueOf(i.getAffectedLocalId().toString()))
                     .commitDate(i.getCommitMetadata().get().getCommitDate())
                     .build();
 
