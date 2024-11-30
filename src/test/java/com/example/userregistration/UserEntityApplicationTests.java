@@ -42,6 +42,7 @@ class UserEntityApplicationTests {
     ContactEntity contactEntity = new ContactEntity();
     private static Long id = 0L;
     Faker faker = new Faker();
+
     @BeforeAll
     static void beforeAll() {
         restTemplate = new RestTemplate();
@@ -52,7 +53,6 @@ class UserEntityApplicationTests {
         baseUrl = baseUrl.concat(String.valueOf(port)).concat("/api/v1");
         bookingEntity = initBookingData();
         bookingEntity.setContacts(List.of(initContactData()));
-        bookingEntity.setContracts(List.of(initContractData()));
         contactEntity = initContactData();
     }
 
@@ -169,12 +169,6 @@ class UserEntityApplicationTests {
         assertThat(byId, is(Optional.empty()));
     }
 
-    ContractEntity initContractData() {
-        return ContractEntity.builder()
-                .frtTermCode(faker.numerify("####"))
-                .status("T")
-                .build();
-    }
 
     ContactEntity initContactData() {
         return ContactEntity.builder()

@@ -39,10 +39,7 @@ class BookingControllerTest {
     @RepeatedTest(10)
     void createBooking() throws Exception {
 
-        ContractEntity contractEntity = ContractEntity.builder()
-                .frtTermCode(faker.phoneNumber().cellPhone())
-                .status(faker.letterify("??????"))
-                .build();
+
         ContactEntity contactEntity = ContactEntity.builder()
                 .name(faker.name().fullName())
                 .mobileNo(faker.phoneNumber().cellPhone())
@@ -50,7 +47,6 @@ class BookingControllerTest {
         BookingEntity bookingEntity = BookingEntity.builder()
                 .bkgRqstNo(faker.phoneNumber().cellPhone())
                 .contacts(List.of(contactEntity))
-                .contracts(List.of(contractEntity))
                 .build();
 
         log.info("bookingEntity: \n" + bookingEntity);
