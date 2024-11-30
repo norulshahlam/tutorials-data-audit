@@ -126,8 +126,8 @@ public class AuditController {
                     /* Add additional info for field changes */
                     if (type.equals("org.javers.core.diff.changetype.ValueChange")) {
                         PropertyChange<?> change = (PropertyChange<?>) j;
-                        mapped.setNewValue(change.getLeft().toString());
-                        mapped.setOldValue(change.getRight().toString());
+                        mapped.setOldValue(change.getLeft().toString());
+                        mapped.setNewValue(change.getRight().toString());
                         mapped.setFieldName(change.getPropertyName());
                     }
                     mappedList.add(mapped);
