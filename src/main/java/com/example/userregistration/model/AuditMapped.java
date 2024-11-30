@@ -1,22 +1,24 @@
 package com.example.userregistration.model;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AudiMapped {
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+public class AuditMapped {
 
     private BigInteger commitId;
-    private LocalDateTime commitDate;
+    private LocalDate commitDate;
     private String version;
     private Integer id;
     private String author;
