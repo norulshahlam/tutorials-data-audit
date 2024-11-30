@@ -80,7 +80,9 @@ public class AuditController {
             @PathVariable Long id) {
         QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
-        log.info("changes: {}\n", changes.groupByCommit());
+
+        List<ChangesByCommit> changesByCommits = changes.groupByCommit();
+        log.info("changesByCommits: {}\n", changesByCommits);
 
         mapLogDetails(changes);
         return ResponseEntity.ok().body(changes.prettyPrint());
@@ -90,6 +92,7 @@ public class AuditController {
     private void mapLogDetails(Changes changes) {
         List<AudiMapped> mappedList = new ArrayList<>();
         changes.groupByCommit().forEach(i -> {
+
             List<Change> singleCommit = i.get();
             singleCommit.forEach(j -> {
 
