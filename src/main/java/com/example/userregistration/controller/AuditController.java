@@ -112,6 +112,7 @@ public class AuditController {
 
             System.out.println("Type j: " + j.getClass().getName());
 
+            /* Remove unnecessary info */
             if (Stream.of("TerminalValueChange", "InitialValueChange").noneMatch(i -> i.equals(j.getClass().getName())) && j.getCommitMetadata().isPresent()) {
                 AudiMapped mapped = AudiMapped.builder()
                         .commitId(BigInteger.valueOf(j.getCommitMetadata().get().getId().getMajorId()))
@@ -120,13 +121,14 @@ public class AuditController {
                         .author(j.getCommitMetadata().get().getAuthor())
                         .type(j.getClass().getName())
                         .build();
+
+                /* Add additional info for field changes */
                 if (j.getClass().getName().equals("ValueChange")) {
                     mapped.setNewValue("");
                     mapped.setOldValue("");
                     mapped.setFieldName("");
                 }
                 mappedList.add(mapped);
-
             }
         });
     }
