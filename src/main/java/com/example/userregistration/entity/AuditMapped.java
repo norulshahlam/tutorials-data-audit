@@ -1,4 +1,4 @@
-package com.example.userregistration.model;
+package com.example.userregistration.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 
@@ -15,12 +16,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Entity
+@Table(name = "AUDIT_MAPPED")
 public class AuditMapped {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer commit;
+    private Integer id;
     private BigInteger commitId;
     private LocalDateTime commitDate;
     private String version;
-    private Integer id;
     private String author;
     private String type;
     private String fieldName;

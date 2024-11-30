@@ -1,8 +1,9 @@
 package com.example.userregistration.controller;
 
+import com.example.userregistration.entity.AuditMapped;
 import com.example.userregistration.entity.BookingEntity;
 import com.example.userregistration.entity.ContactEntity;
-import com.example.userregistration.model.AuditMapped;
+import com.example.userregistration.repository.AuditMappedRepository;
 import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.service.JaversService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,17 +41,16 @@ import java.util.stream.Collectors;
 public class AuditController {
 
     private final Javers javers;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
-
     private final BookingRepository bookingRepository;
-
     private final JaversService javersService;
+    private final AuditMappedRepository auditMappedRepository;
 
-    public AuditController(Javers javers, BookingRepository bookingRepository, JaversService javersService) {
+    public AuditController(Javers javers, BookingRepository bookingRepository, JaversService javersService, AuditMappedRepository auditMappedRepository) {
         this.javers = javers;
         this.bookingRepository = bookingRepository;
         this.javersService = javersService;
+        this.auditMappedRepository = auditMappedRepository;
     }
 
     @GetMapping("/booking")
@@ -100,44 +100,10 @@ public class AuditController {
         Changes changes = javers.findChanges(jqlQuery.build());
 
         List<AuditMapped> mappedList = mapLogDetails(changes);
-        log.info("mappedList: \n{}", mappedList);
+        mappedList.forEach(i -> log.info("mappedList: \n{}", i));
         return ResponseEntity.ok().body(mappedList);
     }
 
-
-    private List<AuditMapped> mapLogDetails(Changes changes) {
-        List<AuditMapped> mappedList = new ArrayList<>();
-        changes.forEach(j -> {
-            System.out.println("Type j: " + j.getClass().getName());
-
-            /* Remove unnecessary info */
-            if (j.getCommitMetadata().isPresent()) {
-                CommitMetadata commitMetadata = j.getCommitMetadata().get();
-                String type = j.getClass().getName();
-                if (!type.equals("org.javers.core.diff.changetype.TerminalValueChange")
-                    && !type.equals("org.javers.core.diff.changetype.InitialValueChange")) {
-                    AuditMapped mapped = AuditMapped.builder()
-                            .commitId(BigInteger.valueOf(commitMetadata.getId().getMajorId()))
-                            .commitDate(commitMetadata.getCommitDate())
-//                            .commitDate(Date.from(j.getCommitMetadata().get().getCommitDate().toInstant(ZoneOffset.UTC)))
-                            .id(Integer.valueOf(j.getAffectedLocalId().toString()))
-                            .author(commitMetadata.getAuthor())
-                            .type(type.substring(type.lastIndexOf('.') + 1))
-                            .build();
-
-                    /* Add additional info for field changes */
-                    if (type.equals("org.javers.core.diff.changetype.ValueChange")) {
-                        PropertyChange<?> change = (PropertyChange<?>) j;
-                        mapped.setOldValue(change.getLeft().toString());
-                        mapped.setNewValue(change.getRight().toString());
-                        mapped.setFieldName(change.getPropertyName());
-                    }
-                    mappedList.add(mapped);
-                }
-            }
-        });
-        return mappedList;
-    }
 
     @GetMapping("/allPretty")
     public ResponseEntity<String> getAllEntityChangesPretty() {
@@ -259,5 +225,40 @@ public class AuditController {
                 .withChildValueObjects().build();
         Changes contractChanges = javers.findChanges(contractJqlQuery);
         changes.addAll(contractChanges);
+    }
+
+    private List<AuditMapped> mapLogDetails(Changes changes) {
+        List<AuditMapped> mappedList = new ArrayList<>();
+        changes.forEach(j -> {
+            System.out.println("Type j: " + j.getClass().getName());
+
+            /* Remove unnecessary info */
+            if (j.getCommitMetadata().isPresent()) {
+                CommitMetadata commitMetadata = j.getCommitMetadata().get();
+                String type = j.getClass().getName();
+                if (!type.equals("org.javers.core.diff.changetype.TerminalValueChange")
+                    && !type.equals("org.javers.core.diff.changetype.InitialValueChange")) {
+                    AuditMapped mapped = AuditMapped.builder()
+                            .commitId(BigInteger.valueOf(commitMetadata.getId().getMajorId()))
+                            .commitDate(commitMetadata.getCommitDate())
+//                            .commitDate(Date.from(j.getCommitMetadata().get().getCommitDate().toInstant(ZoneOffset.UTC)))
+                            .id(Integer.valueOf(j.getAffectedLocalId().toString()))
+                            .author(commitMetadata.getAuthor())
+                            .type(type.substring(type.lastIndexOf('.') + 1))
+                            .build();
+
+                    /* Add additional info for field changes */
+                    if (type.equals("org.javers.core.diff.changetype.ValueChange")) {
+                        PropertyChange<?> change = (PropertyChange<?>) j;
+                        mapped.setOldValue(change.getLeft().toString());
+                        mapped.setNewValue(change.getRight().toString());
+                        mapped.setFieldName(change.getPropertyName());
+                    }
+                    mappedList.add(mapped);
+                }
+            }
+        });
+        auditMappedRepository.saveAll(mappedList);
+        return mappedList;
     }
 }
