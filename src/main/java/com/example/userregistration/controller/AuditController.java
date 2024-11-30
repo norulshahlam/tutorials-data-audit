@@ -21,6 +21,7 @@ import org.javers.core.Javers;
 import org.javers.core.JaversCoreProperties;
 import org.javers.core.commit.CommitId;
 import org.javers.core.diff.Change;
+import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.http.MediaType;
@@ -126,9 +127,9 @@ public class AuditController {
 
                     /* Add additional info for field changes */
                     if (type.equals("org.javers.core.diff.changetype.ValueChange")) {
-                        mapped.setNewValue("");
-                        mapped.setOldValue("");
-                        mapped.setFieldName("");
+                        mapped.setNewValue(((PropertyChange<?>) j).getLeft().toString());
+                        mapped.setOldValue(((PropertyChange<?>) j).getRight().toString());
+                        mapped.setFieldName(((PropertyChange<?>) j).getPropertyName());
                     }
                     mappedList.add(mapped);
                 }
