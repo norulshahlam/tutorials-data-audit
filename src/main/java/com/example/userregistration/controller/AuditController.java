@@ -91,15 +91,14 @@ public class AuditController {
 
     private void mapLogDetails(Changes changes) {
         List<AudiMapped> mappedList = new ArrayList<>();
-        changes.groupByCommit().forEach(i -> {
+        changes.forEach(i -> {
 
-            List<Change> singleCommit = i.get();
-            singleCommit.forEach(j -> {
-
-                AudiMapped.builder()
-                        .commitId(BigInteger.valueOf(j.getCommitMetadata().get().getId().getMajorId()))
-                        .build();
-            });
+i.getAffectedLocalId().toString();
+            AudiMapped.builder()
+                    .author(i.getCommitMetadata().get().getAuthor())
+                    .commitId(BigInteger.valueOf(i.getCommitMetadata().get().getId().getMajorId()))
+                    .commitDate(i.getCommitMetadata().get().getCommitDate())
+                    .build();
 
         });
 
