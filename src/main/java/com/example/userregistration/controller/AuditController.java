@@ -20,6 +20,7 @@ import org.javers.core.ChangesByCommit;
 import org.javers.core.Javers;
 import org.javers.core.JaversCoreProperties;
 import org.javers.core.commit.CommitId;
+import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.repository.jql.JqlQuery;
@@ -99,7 +100,7 @@ public class AuditController {
         Changes changes = javers.findChanges(jqlQuery.build());
 
         List<AuditMapped> mappedList = mapLogDetails(changes);
-        log.info("mappedList: \n{}",mappedList);
+        log.info("mappedList: \n{}", mappedList);
         return ResponseEntity.ok().body(mappedList);
     }
 
@@ -111,15 +112,16 @@ public class AuditController {
 
             /* Remove unnecessary info */
             if (j.getCommitMetadata().isPresent()) {
+                CommitMetadata commitMetadata = j.getCommitMetadata().get();
                 String type = j.getClass().getName();
                 if (!type.equals("org.javers.core.diff.changetype.TerminalValueChange")
                     && !type.equals("org.javers.core.diff.changetype.InitialValueChange")) {
                     AuditMapped mapped = AuditMapped.builder()
-                            .commitId(BigInteger.valueOf(j.getCommitMetadata().get().getId().getMajorId()))
-                            .commitDate(j.getCommitMetadata().get().getCommitDate().toLocalDate())
+                            .commitId(BigInteger.valueOf(commitMetadata.getId().getMajorId()))
+                            .commitDate(commitMetadata.getCommitDate())
 //                            .commitDate(Date.from(j.getCommitMetadata().get().getCommitDate().toInstant(ZoneOffset.UTC)))
                             .id(Integer.valueOf(j.getAffectedLocalId().toString()))
-                            .author(j.getCommitMetadata().get().getAuthor())
+                            .author(commitMetadata.getAuthor())
                             .type(type.substring(type.lastIndexOf('.') + 1))
                             .build();
 
