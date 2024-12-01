@@ -263,7 +263,7 @@ public class AuditController {
                             .build();
 
                     /* Add additional info for field changes */
-                    if (type.equals("ValueChange")) {
+                    if ("ValueChange".equals(type)) {
                         PropertyChange<?> change = (PropertyChange<?>) j;
                         mapped.setOldValue(change.getLeft().toString());
                         mapped.setNewValue(change.getRight().toString());
