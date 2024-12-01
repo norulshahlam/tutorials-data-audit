@@ -25,7 +25,7 @@ public class AuditMapped {
     private Integer id;
     private BigInteger commitId;
     private LocalDateTime commitDate;
-    private String version;
+    private Long version;
     private String author;
     private String type;
     private String fieldName;
