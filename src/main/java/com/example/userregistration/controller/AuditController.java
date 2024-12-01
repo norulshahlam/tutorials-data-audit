@@ -258,7 +258,7 @@ public class AuditController {
                             .commitDate(commitMetadata.getCommitDate())
                             .id(Integer.valueOf(j.getAffectedLocalId().toString()))
                             .author(commitMetadata.getAuthor())
-                            .type(type.substring(type.lastIndexOf('.') + 1))
+                            .type(type)
                             .version(version)
                             .build();
 
