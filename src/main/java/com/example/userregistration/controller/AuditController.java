@@ -298,16 +298,16 @@ public class AuditController {
         // Add rows to the table
         for (AuditMapped record : records) {
             table.addRow(
-                    record.getCommit() != null ? record.getCommit() : "null",
-                    record.getId() != null ? record.getId() : "null",
-                    record.getCommitId() != null ? record.getCommitId() : "null",
-                    record.getCommitDate() != null ? record.getCommitDate() : "null",
-                    record.getVersion() != null ? record.getVersion() : "null",
-                    record.getAuthor() != null ? record.getAuthor() : "null",
-                    record.getType() != null ? record.getType() : "null",
-                    record.getFieldName() != null ? record.getFieldName() : "null",
-                    record.getOldValue() != null ? record.getOldValue() : "null",
-                    record.getNewValue() != null ? record.getNewValue() : "null"
+                    record.getCommit() != null ? record.getCommit() : "",
+                    record.getId() != null ? record.getId() : "",
+                    record.getCommitId() != null ? record.getCommitId() : "",
+                    record.getCommitDate() != null ? record.getCommitDate() : "",
+                    record.getVersion() != null ? record.getVersion() : "",
+                    record.getAuthor() != null ? record.getAuthor() : "",
+                    record.getType() != null ? record.getType() : "",
+                    record.getFieldName() != null ? record.getFieldName() : "",
+                    record.getOldValue() != null ? record.getOldValue() : "",
+                    record.getNewValue() != null ? record.getNewValue() : ""
             );
             table.addRule();
         }
