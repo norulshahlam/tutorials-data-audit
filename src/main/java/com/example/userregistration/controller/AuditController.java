@@ -39,7 +39,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -111,12 +110,11 @@ public class AuditController {
         if (!changes.isEmpty()) {
             List<AuditMapped> mappedList = customizeAuditDetails(changes, snapshots);
             exportAsText(mappedList);
-            mappedList.forEach(i -> log.info("mappedList: \n{}", i));
+//            mappedList.forEach(i -> log.info("mappedList: \n{}", i));
             return ResponseEntity.ok().body(mappedList);
         }
         return ResponseEntity.ok(new ArrayList<>());
     }
-
 
     @GetMapping("/allPretty")
     public ResponseEntity<String> getAllEntityChangesPretty() {
@@ -301,20 +299,25 @@ public class AuditController {
         for (AuditMapped record : records) {
             table.addRow(record.getCommit(), record.getCommitId(), record.getCommit(),
                     record.getCommitDate(), record.getVersion(), record.getAuthor(),
-                    record.getType(), record.getFieldName(), record.getOldValue() != null ? record.getOldValue() : "null",
+                    record.getType(), record.getFieldName(),
+                    record.getOldValue() != null ? record.getOldValue() : "null",
                     record.getNewValue() != null ? record.getNewValue() : "null");
             table.addRule();
         }
 
         // Render the table
         String tableString = table.render();
+        log.info(tableString);
 
         // Write the table to a text file
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get("src", "main", "resources", "data").toString()))) {
+        String filePath = "src/main/resources/data.txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             writer.write(tableString);
+            log.info("File successfully written to: " + filePath);
         } catch (IOException e) {
             throw new RuntimeException("Error writing to file", e);
         }
+        log.info("Saving to text file");
     }
 
 }
