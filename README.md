@@ -52,6 +52,6 @@ Custom mapping
 
 ![Image](src/main/resources/custom-mapping.JPG)
 
-Custom mapping txt file
+Custom mapping to text file
 
 ![Image](src/main/resources/custom-mapping-txt.PNG)
