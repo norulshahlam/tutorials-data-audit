@@ -1,6 +1,7 @@
 package com.example.userregistration.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "AUDIT_MAPPED")
+@JsonPropertyOrder({"commit","commitId","version"})
 public class AuditMapped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

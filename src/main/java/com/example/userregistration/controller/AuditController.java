@@ -314,8 +314,7 @@ public class AuditController {
 
         // Render the table
         String tableString = table.render();
-        log.info(tableString);
-        System.out.println(System.getProperty("user.home"));
+
         // Write the table to a text file
        String path = "C:/Users/NORUL/Documents/GitHub/tutorials-data-audit/src/main/resources/data.txt";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
