@@ -297,23 +297,30 @@ public class AuditController {
 
         // Add rows to the table
         for (AuditMapped record : records) {
-            table.addRow(record.getCommit(), record.getCommitId(), record.getCommit(),
-                    record.getCommitDate(), record.getVersion(), record.getAuthor(),
-                    record.getType(), record.getFieldName(),
+            table.addRow(
+                    record.getCommit() != null ? record.getCommit() : "null",
+                    record.getId() != null ? record.getId() : "null",
+                    record.getCommitId() != null ? record.getCommitId() : "null",
+                    record.getCommitDate() != null ? record.getCommitDate() : "null",
+                    record.getVersion() != null ? record.getVersion() : "null",
+                    record.getAuthor() != null ? record.getAuthor() : "null",
+                    record.getType() != null ? record.getType() : "null",
+                    record.getFieldName() != null ? record.getFieldName() : "null",
                     record.getOldValue() != null ? record.getOldValue() : "null",
-                    record.getNewValue() != null ? record.getNewValue() : "null");
+                    record.getNewValue() != null ? record.getNewValue() : "null"
+            );
             table.addRule();
         }
 
         // Render the table
         String tableString = table.render();
         log.info(tableString);
-
+        System.out.println(System.getProperty("user.home"));
         // Write the table to a text file
-        String filePath = "C:/Users/NORUL/Documents/GitHub/tutorials-data-audit/src/main/resources/data.txt";
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+       String path = "C:/Users/NORUL/Documents/GitHub/tutorials-data-audit/src/main/resources/data.txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             writer.write(tableString);
-            log.info("File successfully written to: " + filePath);
+            log.info("File successfully written to: " + path);
         } catch (IOException e) {
             throw new RuntimeException("Error writing to file", e);
         }
