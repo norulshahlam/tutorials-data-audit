@@ -50,8 +50,8 @@ Default mapping
 
 Custom mapping
 
-![Image](src/main/resources/custom-mapping.PNG)
+![Image](src/main/resources/custom-mapping.JPG)
 
 Custom mapping txt file
 
-![Image](src/main/resources/custom-mapping-txt.JPG)
+![Image](src/main/resources/custom-mapping-txt.PNG)
