@@ -250,7 +250,6 @@ public class AuditController {
                 /* Get class name */
                 String type = j.getClass().getSimpleName();
 
-                /* Remove unnecessary info */
                 /* Map only certain types and skip certain types for simplification */
                 if ("TerminalValueChange".equals(type) || "InitialValueChange".equals(type))
                     return;
