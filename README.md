@@ -1,6 +1,6 @@
 # Data auditing 
 
-## This is a tutorial for auditing using [Javers](https://javers.org/documentation/jql-examples/)
+## This is a tutorial for auditing using [Javers](https://javers.org/documentation/jql-examples/). We will be using h2 as the default DB
 
 ## There is booking entity that contains contact entity. Add either one first, then edit or delete using Swagger
 
@@ -35,7 +35,9 @@ Clean up can be done in the following order:
 Run the endpoint `/audit/contactsPretty` first, and it will save for you your custom audit mapping.
 
     SELECT commit, commit_id, version, id, author, type, field_name, old_value, new_value, commit_date FROM AUDIT_MAPPED order by commit_date desc
-## There will be preloaded data, so you can access right away
+## Use case
+
+There will be preloaded data, so you can access the audit right away
 
     add 2 new records
     edit both records
