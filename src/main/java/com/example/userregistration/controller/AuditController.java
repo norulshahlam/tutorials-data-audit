@@ -233,39 +233,37 @@ public class AuditController {
 
     private List<AuditMapped> customizeAuditDetails(Changes changes, List<CdoSnapshot> snapshots) {
 
+        // Map commitId (majorId) to version
         Map<Long, Long> commitIdToVersion = snapshots.stream()
                 .collect(Collectors.toMap(snapshot -> snapshot.getCommitMetadata().getId().getMajorId(), CdoSnapshot::getVersion));
 
-
         List<AuditMapped> mappedList = new ArrayList<>();
+
         changes.forEach(j -> {
 
             if (j.getCommitMetadata().isPresent()) {
                 CommitMetadata commitMetadata = j.getCommitMetadata().get();
 
                 // Use stream to find the matching majorId and get the version
-                Optional<Long> versionOptional = commitIdToVersion.entrySet().stream()
-                        .filter(entry -> entry.getKey().equals(commitMetadata.getId().getMajorId()))
-                        .map(Map.Entry::getValue)
-                        .findFirst();
+                Long version = commitIdToVersion.getOrDefault(commitMetadata.getId().getMajorId(), -1L);
 
                 /* Get class name */
-                String type = j.getClass().getName();
+                String type = j.getClass().getSimpleName();
 
                 /* Remove unnecessary info */
-                if (!type.equals("org.javers.core.diff.changetype.TerminalValueChange")
-                    && !type.equals("org.javers.core.diff.changetype.InitialValueChange")) {
+                if (!type.equals("TerminalValueChange")
+                    && !type.equals("InitialValueChange")) {
                     AuditMapped mapped = AuditMapped.builder()
                             .commitId(BigInteger.valueOf(commitMetadata.getId().getMajorId()))
                             .commitDate(commitMetadata.getCommitDate())
                             .id(Integer.valueOf(j.getAffectedLocalId().toString()))
                             .author(commitMetadata.getAuthor())
                             .type(type.substring(type.lastIndexOf('.') + 1))
-                            .version(versionOptional.orElse(-1L))
+                            .version(version)
                             .build();
 
                     /* Add additional info for field changes */
-                    if (type.equals("org.javers.core.diff.changetype.ValueChange")) {
+                    if (type.equals("ValueChange")) {
                         PropertyChange<?> change = (PropertyChange<?>) j;
                         mapped.setOldValue(change.getLeft().toString());
                         mapped.setNewValue(change.getRight().toString());
