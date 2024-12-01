@@ -46,12 +46,12 @@ Clean up can be done in the following order:
 
 Default mapping
 
-![image]("src/main/resources/default-mapping.jpg")
+![Image](src/main/resources/default-mapping.JPG)
 
 Custom mapping
 
-![image]("src/main/resources/custom-mapping.jpg")
+![Image](src/main/resources/custom-mapping.JPG)
 
 Custom mapping txt file
 
-![image]("src/main/resources/custom-mapping.jpg")
+![Image](src/main/resources/custom-mapping-txt.JPG)
