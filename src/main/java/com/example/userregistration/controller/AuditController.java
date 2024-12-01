@@ -251,9 +251,8 @@ public class AuditController {
                 String type = j.getClass().getSimpleName();
 
                 /* Remove unnecessary info */
-                if ("TerminalValueChange".equals(type) || "InitialValueChange".equals(type))
-
-                return;
+                if (!type.equals("TerminalValueChange")
+                    && !type.equals("InitialValueChange")) {
                     AuditMapped mapped = AuditMapped.builder()
                             .commitId(BigInteger.valueOf(commitMetadata.getId().getMajorId()))
                             .commitDate(commitMetadata.getCommitDate())
@@ -272,7 +271,7 @@ public class AuditController {
                     }
                     mappedList.add(mapped);
                 }
-            
+            }
         });
         auditMappedRepository.saveAll(mappedList);
         return mappedList;
