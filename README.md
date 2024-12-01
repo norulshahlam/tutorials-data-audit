@@ -46,7 +46,7 @@ Clean up can be done in the following order:
 
 Default mapping
 
-![image]("./src/main/resources/default-mapping.jpg")
+![image]("src/main/resources/default-mapping.jpg")
 
 Custom mapping
 
@@ -54,4 +54,4 @@ Custom mapping
 
 Custom mapping txt file
 
-![image]("./src/main/resources/custom-mapping.jpg")
+![image]("src/main/resources/custom-mapping.jpg")
