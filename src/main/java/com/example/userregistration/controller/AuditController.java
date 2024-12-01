@@ -8,7 +8,7 @@ import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.service.JaversService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.vandermeer.asciitable.AsciiTable;
-import de.vandermeer.asciitable.CWC_LongestLine;
+import de.vandermeer.asciitable.CWC_LongestWord;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -288,7 +288,7 @@ public class AuditController {
     private void exportAsText(List<AuditMapped> records) {
         // Create an ASCII table
         AsciiTable table = new AsciiTable();
-        table.getRenderer().setCWC(new CWC_LongestLine());
+        table.getRenderer().setCWC(new CWC_LongestWord());
         table.addRule();
         table.addRow("commit", "id", "commitId", "commitDate",
                 "version", "author", "type",
@@ -310,7 +310,7 @@ public class AuditController {
         log.info(tableString);
 
         // Write the table to a text file
-        String filePath = "src/main/resources/data.txt";
+        String filePath = "C:/Users/NORUL/Documents/GitHub/tutorials-data-audit/src/main/resources/data.txt";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             writer.write(tableString);
             log.info("File successfully written to: " + filePath);
