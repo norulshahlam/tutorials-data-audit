@@ -7,6 +7,9 @@ import com.example.userregistration.repository.AuditMappedRepository;
 import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.service.JaversService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.vandermeer.asciitable.AsciiTable;
+import de.vandermeer.asciitable.CWC_LongestLine;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,7 +35,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -103,6 +110,7 @@ public class AuditController {
 
         if (!changes.isEmpty()) {
             List<AuditMapped> mappedList = customizeAuditDetails(changes, snapshots);
+            exportAsText(mappedList);
             mappedList.forEach(i -> log.info("mappedList: \n{}", i));
             return ResponseEntity.ok().body(mappedList);
         }
@@ -199,6 +207,8 @@ public class AuditController {
         return ResponseEntity.ok().body("No changes found for booking with id: " + id);
     }
 
+
+    @Hidden
     @GetMapping("/getShadowsWithScopeDeepPlusQuery")
     public List getShadowsWithScopeDeepPlusQuery(
             @RequestParam(defaultValue = "1") Long id,
@@ -212,6 +222,7 @@ public class AuditController {
         return javersService.getShadowsWithScopeDeepPlusQuery(id, className, page, pageSize, isNextRecordRequired);
     }
 
+    @Hidden
     @GetMapping("/getShadowsWithShadowScopeQuery")
     public List getShadowsWithShadowScopeQuery(
             @RequestParam(defaultValue = "1") Long id,
@@ -253,26 +264,57 @@ public class AuditController {
                 /* Map only certain types and skip certain types for simplification */
                 if ("TerminalValueChange".equals(type) || "InitialValueChange".equals(type))
                     return;
-                    AuditMapped mapped = AuditMapped.builder()
-                            .commitId(BigInteger.valueOf(commitMetadata.getId().getMajorId()))
-                            .commitDate(commitMetadata.getCommitDate())
-                            .id(Integer.valueOf(j.getAffectedLocalId().toString()))
-                            .author(commitMetadata.getAuthor())
-                            .type(type)
-                            .version(version)
-                            .build();
+                AuditMapped mapped = AuditMapped.builder()
+                        .commitId(BigInteger.valueOf(commitMetadata.getId().getMajorId()))
+                        .commitDate(commitMetadata.getCommitDate())
+                        .id(Integer.valueOf(j.getAffectedLocalId().toString()))
+                        .author(commitMetadata.getAuthor())
+                        .type(type)
+                        .version(version)
+                        .build();
 
-                    /* Add additional info for field changes */
-                    if ("ValueChange".equals(type)) {
-                        PropertyChange<?> change = (PropertyChange<?>) j;
-                        mapped.setOldValue(change.getLeft().toString());
-                        mapped.setNewValue(change.getRight().toString());
-                        mapped.setFieldName(change.getPropertyName());
-                    }
-                    mappedList.add(mapped);
+                /* Add additional info for field changes */
+                if ("ValueChange".equals(type)) {
+                    PropertyChange<?> change = (PropertyChange<?>) j;
+                    mapped.setOldValue(change.getLeft().toString());
+                    mapped.setNewValue(change.getRight().toString());
+                    mapped.setFieldName(change.getPropertyName());
                 }
+                mappedList.add(mapped);
+            }
         });
         auditMappedRepository.saveAll(mappedList);
         return mappedList;
     }
+
+    private void exportAsText(List<AuditMapped> records) {
+        // Create an ASCII table
+        AsciiTable table = new AsciiTable();
+        table.getRenderer().setCWC(new CWC_LongestLine());
+        table.addRule();
+        table.addRow("commit", "id", "commitId", "commitDate",
+                "version", "author", "type",
+                "fieldName", "oldValue", "newValue");
+        table.addRule();
+
+        // Add rows to the table
+        for (AuditMapped record : records) {
+            table.addRow(record.getCommit(), record.getCommitId(), record.getCommit(),
+                    record.getCommitDate(), record.getVersion(), record.getAuthor(),
+                    record.getType(), record.getFieldName(), record.getOldValue() != null ? record.getOldValue() : "null",
+                    record.getNewValue() != null ? record.getNewValue() : "null");
+            table.addRule();
+        }
+
+        // Render the table
+        String tableString = table.render();
+
+        // Write the table to a text file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Paths.get("src", "main", "resources", "data").toString()))) {
+            writer.write(tableString);
+        } catch (IOException e) {
+            throw new RuntimeException("Error writing to file", e);
+        }
+    }
+
 }
