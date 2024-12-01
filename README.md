@@ -16,12 +16,6 @@
     JDBC URL: jdbc:h2:mem:audittable  
     SELECT * FROM JV_SNAPSHOT  
 
-## There will be preloaded data
-
-    add 2 new records
-    edit both records
-    delete both records
-
 ### For direct DB audit data
 
     SELECT commit_id,  version, g.local_id as "id",  author, type, state, changed_properties, managed_type, commit_date FROM jv_snapshot INNER JOIN jv_commit ON commit_pk = commit_fk INNER JOIN jv_global_id g ON g.global_id_pk = global_id_fk LEFT OUTER JOIN jv_global_id o ON o.global_id_pk = g.owner_id_fk WHERE 1 = 1 ORDER BY g.local_id
@@ -41,6 +35,12 @@ Clean up can be done in the following order:
     DELETE FROM jv_global_id WHERE owner_id_fk IS NOT NULL;
     DELETE FROM jv_global_id;
     Note : You can put the filter clause as per your need which is not considered in the above DB Script.
+
+## There will be preloaded data, so you can access right away
+
+    add 2 new records
+    edit both records
+    delete both records
 
 ## Image samples
 
