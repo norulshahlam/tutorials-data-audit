@@ -24,6 +24,7 @@ import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.changetype.PropertyChange;
+import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.http.MediaType;
@@ -98,9 +99,10 @@ public class AuditController {
     public ResponseEntity<List<AuditMapped>> getContractEntityChangesPrettyAll() {
         QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
+        List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
 
         if (!changes.isEmpty()) {
-            List<AuditMapped> mappedList = customizeAuditDetails(changes);
+            List<AuditMapped> mappedList = customizeAuditDetails(changes, snapshots);
             mappedList.forEach(i -> log.info("mappedList: \n{}", i));
             return ResponseEntity.ok().body(mappedList);
         }
@@ -229,15 +231,28 @@ public class AuditController {
         changes.addAll(contractChanges);
     }
 
-    private List<AuditMapped> customizeAuditDetails(Changes changes) {
+    private List<AuditMapped> customizeAuditDetails(Changes changes, List<CdoSnapshot> snapshots) {
+
+        Map<Long, Long> commitIdToVersion = snapshots.stream()
+                .collect(Collectors.toMap(snapshot -> snapshot.getCommitMetadata().getId().getMajorId(), CdoSnapshot::getVersion));
+
+
         List<AuditMapped> mappedList = new ArrayList<>();
         changes.forEach(j -> {
-            System.out.println("Type j: " + j.getClass().getName());
 
-            /* Remove unnecessary info */
             if (j.getCommitMetadata().isPresent()) {
                 CommitMetadata commitMetadata = j.getCommitMetadata().get();
+
+                // Use stream to find the matching majorId and get the version
+                Optional<Long> versionOptional = commitIdToVersion.entrySet().stream()
+                        .filter(entry -> entry.getKey().equals(commitMetadata.getId().getMajorId()))
+                        .map(Map.Entry::getValue)
+                        .findFirst();
+
+                /* Get class name */
                 String type = j.getClass().getName();
+
+                /* Remove unnecessary info */
                 if (!type.equals("org.javers.core.diff.changetype.TerminalValueChange")
                     && !type.equals("org.javers.core.diff.changetype.InitialValueChange")) {
                     AuditMapped mapped = AuditMapped.builder()
@@ -247,6 +262,7 @@ public class AuditController {
                             .id(Integer.valueOf(j.getAffectedLocalId().toString()))
                             .author(commitMetadata.getAuthor())
                             .type(type.substring(type.lastIndexOf('.') + 1))
+                            .version(versionOptional.orElse(-1L))
                             .build();
 
                     /* Add additional info for field changes */
