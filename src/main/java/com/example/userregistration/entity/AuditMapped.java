@@ -1,7 +1,6 @@
 package com.example.userregistration.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +14,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Entity
 @Table(name = "AUDIT_MAPPED")
 public class AuditMapped {
