@@ -252,6 +252,7 @@ public class AuditController {
 
             if (j.getCommitMetadata().isPresent()) {
                 CommitMetadata commitMetadata = j.getCommitMetadata().get();
+                String entityName = j.getAffectedGlobalId().getTypeName().substring(j.getAffectedGlobalId().getTypeName().lastIndexOf('.') + 1);
 
                 // Use stream to find the matching majorId and get the version
                 Long version = commitIdToVersion.getOrDefault(commitMetadata.getId().toString(), -1L);
@@ -263,11 +264,12 @@ public class AuditController {
                 if ("TerminalValueChange".equals(type) || "InitialValueChange".equals(type))
                     return;
                 AuditMapped mapped = AuditMapped.builder()
-                        .commitId(new BigDecimal( commitMetadata.getId().toString()))
+                        .commitId(new BigDecimal(commitMetadata.getId().toString()))
                         .commitDate(commitMetadata.getCommitDate())
                         .id(Integer.valueOf(j.getAffectedLocalId().toString()))
                         .author(commitMetadata.getAuthor())
                         .type(type)
+                        .entityName(entityName)
                         .version(version)
                         .build();
 
@@ -316,7 +318,7 @@ public class AuditController {
         String tableString = table.render();
 
         // Write the table to a text file
-       String path = "C:/Users/NORUL/Documents/GitHub/tutorials-data-audit/src/main/resources/data.txt";
+        String path = "C:/Users/NORUL/Documents/GitHub/tutorials-data-audit/src/main/resources/data.txt";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             writer.write(tableString);
             log.info("File successfully written to: " + path);
