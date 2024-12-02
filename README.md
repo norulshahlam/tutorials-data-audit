@@ -31,10 +31,6 @@ Clean up can be done in the following order:
     DELETE FROM jv_global_id;
     Note : You can put the filter clause as per your need which is not considered in the above DB Script.
 
-## NEW - added table for custom audit mapping
-Run the endpoint `/audit/contactsPretty` first, and it will save for you your custom audit mapping.
-
-    SELECT commit, commit_id, version, id, author, type, field_name, old_value, new_value, commit_date FROM AUDIT_MAPPED order by commit_date desc
 ## Use case
 
 There will be preloaded data, so you can access the audit right away
@@ -42,6 +38,11 @@ There will be preloaded data, so you can access the audit right away
     add 2 new records
     edit both records
     delete both records
+
+## NEW - added table for custom audit mapping
+Run the endpoint `/audit/contactsPretty` first, and it will save for you your custom audit mapping.
+
+    SELECT commit, commit_id, version, id, author, type, field_name, old_value, new_value, commit_date FROM AUDIT_MAPPED order by commit_date desc
 
 ## Image samples
 
