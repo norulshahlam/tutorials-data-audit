@@ -2,7 +2,7 @@
 
 ## This is a tutorial for auditing using [Javers](https://javers.org/documentation/jql-examples/). We will be using h2 as the default DB.
 
-There is booking entity that contains contact entity as child entity. Add either one first, then edit or delete using Swagger. Based on observation, if u edit a child entity within parent entity, only the child entity wil be tracked. 
+There is booking entity that contains contact entity as child entity. Add either one first, then edit or delete using Swagger. Based on your query, if u edit a child entity within parent entity, you can either track child entity or not. Current config will not be track.
 
 ## Swagger url
     http://localhost:8080/swagger-ui/index.html

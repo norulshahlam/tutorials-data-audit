@@ -19,10 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.javers.common.string.PrettyValuePrinter;
-import org.javers.core.Changes;
-import org.javers.core.ChangesByCommit;
-import org.javers.core.Javers;
-import org.javers.core.JaversCoreProperties;
+import org.javers.core.*;
 import org.javers.core.commit.CommitId;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
@@ -69,7 +66,7 @@ public class AuditController {
 
     @GetMapping("/bookingPretty")
     public ResponseEntity<String> getBookingEntityChangesPretty() {
-        QueryBuilder jqlQuery = QueryBuilder.byClass(BookingEntity.class);
+        QueryBuilder jqlQuery = QueryBuilder.byClass(BookingEntity.class).withChildValueObjects();
         Changes changes = javers.findChanges(jqlQuery.build());
         return ResponseEntity.ok().body(changes.prettyPrint() + "</pre>");
     }
