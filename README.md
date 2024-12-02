@@ -16,7 +16,7 @@
     JDBC URL: jdbc:h2:mem:audittable  
     SELECT * FROM JV_SNAPSHOT  
 
-### For direct DB audit data
+### For accessing audit data in DB (default mapping)
 
     SELECT commit_id,  version, g.local_id as "id",  author, type, state, changed_properties, managed_type, commit_date FROM jv_snapshot INNER JOIN jv_commit ON commit_pk = commit_fk INNER JOIN jv_global_id g ON g.global_id_pk = global_id_fk LEFT OUTER JOIN jv_global_id o ON o.global_id_pk = g.owner_id_fk WHERE 1 = 1 ORDER BY g.local_id
 
@@ -48,11 +48,11 @@ Run the endpoint `/audit/contactsPretty` first, and it will save for you your cu
 
 Default mapping
 
-![Image](src/main/resources/default-mapping.JPG)
+![Image](src/main/resources/default-mapping.PNG)
 
 Custom mapping
 
-![Image](src/main/resources/custom-mapping.JPG)
+![Image](src/main/resources/custom-mapping.PNG)
 
 Custom mapping to text file
 
