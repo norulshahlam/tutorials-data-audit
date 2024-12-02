@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -243,8 +243,8 @@ public class AuditController {
     private List<AuditMapped> customizeAuditDetails(Changes changes, List<CdoSnapshot> snapshots) {
 
         // Map commitId (majorId) to version
-        Map<Long, Long> commitIdToVersion = snapshots.stream()
-                .collect(Collectors.toMap(snapshot -> snapshot.getCommitMetadata().getId().getMajorId(), CdoSnapshot::getVersion));
+        Map<String, Long> commitIdToVersion = snapshots.stream()
+                .collect(Collectors.toMap(snapshot -> snapshot.getCommitMetadata().getId().toString(), CdoSnapshot::getVersion));
 
         List<AuditMapped> mappedList = new ArrayList<>();
 
@@ -254,7 +254,7 @@ public class AuditController {
                 CommitMetadata commitMetadata = j.getCommitMetadata().get();
 
                 // Use stream to find the matching majorId and get the version
-                Long version = commitIdToVersion.getOrDefault(commitMetadata.getId().getMajorId(), -1L);
+                Long version = commitIdToVersion.getOrDefault(commitMetadata.getId().toString(), -1L);
 
                 /* Get class name */
                 String type = j.getClass().getSimpleName();
@@ -263,7 +263,7 @@ public class AuditController {
                 if ("TerminalValueChange".equals(type) || "InitialValueChange".equals(type))
                     return;
                 AuditMapped mapped = AuditMapped.builder()
-                        .commitId(BigInteger.valueOf(commitMetadata.getId().getMajorId()))
+                        .commitId(new BigDecimal( commitMetadata.getId().toString()))
                         .commitDate(commitMetadata.getCommitDate())
                         .id(Integer.valueOf(j.getAffectedLocalId().toString()))
                         .author(commitMetadata.getAuthor())

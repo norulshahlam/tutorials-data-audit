@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -23,7 +23,7 @@ public class AuditMapped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer commit;
     private Integer id;
-    private BigInteger commitId;
+    private BigDecimal commitId;
     private LocalDateTime commitDate;
     private Long version;
     private String author;
