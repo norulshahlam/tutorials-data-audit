@@ -269,7 +269,7 @@ public class AuditController {
                         .id(Integer.valueOf(j.getAffectedLocalId().toString()))
                         .author(commitMetadata.getAuthor())
                         .type(type)
-                        .entityName(entityName)
+                        .entity(entityName)
                         .version(version)
                         .build();
 
@@ -294,7 +294,7 @@ public class AuditController {
         table.addRule();
         table.addRow("commit", "id", "commitId", "commitDate",
                 "version", "author", "type",
-                "fieldName", "oldValue", "newValue");
+                "fieldName", "oldValue", "newValue", "entity");
         table.addRule();
 
         // Add rows to the table
@@ -309,7 +309,8 @@ public class AuditController {
                     record.getType() != null ? record.getType() : "",
                     record.getFieldName() != null ? record.getFieldName() : "",
                     record.getOldValue() != null ? record.getOldValue() : "",
-                    record.getNewValue() != null ? record.getNewValue() : ""
+                    record.getNewValue() != null ? record.getNewValue() : "",
+                    record.getEntity() != null ? record.getEntity() : ""
             );
             table.addRule();
         }

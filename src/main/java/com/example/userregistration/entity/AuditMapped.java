@@ -31,6 +31,6 @@ public class AuditMapped {
     private String fieldName;
     private String oldValue;
     private String newValue;
-    private String entityName;
+    private String entity;
 
 }

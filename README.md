@@ -42,7 +42,7 @@ There will be preloaded data, so you can access the audit right away
 ## NEW - added table for custom audit mapping
 Run the endpoint `/audit/contactsPretty` first, and it will save for you your custom audit mapping.
 
-    SELECT commit, commit_id, version, id, author, type, field_name, old_value, new_value, commit_date FROM AUDIT_MAPPED order by commit_date desc
+    SELECT commit, commit_id, version, id, author, type, field_name, old_value, new_value, entity, commit_date FROM AUDIT_MAPPED order by commit_date desc
 
 ## Image samples
 
