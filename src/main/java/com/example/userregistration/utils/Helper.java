@@ -7,6 +7,7 @@ import de.vandermeer.asciitable.CWC_LongestWord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.PreUpdate;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -67,5 +68,6 @@ public class Helper {
         }
         log.info("Saving to text file");
     }
+
 
 }

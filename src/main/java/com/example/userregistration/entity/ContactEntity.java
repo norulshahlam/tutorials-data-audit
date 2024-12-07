@@ -1,5 +1,6 @@
 package com.example.userregistration.entity;
 
+import com.example.userregistration.listener.AuditListener;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -13,6 +14,7 @@ import java.io.Serializable;
 @Builder
 @Entity
 @Table(name = "CONTACT")
+@EntityListeners(AuditListener.class)
 public class ContactEntity implements Serializable {
 
     public static final long serialVersionId = 1L;
