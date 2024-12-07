@@ -5,20 +5,12 @@ import com.example.userregistration.repository.AuditMappedRepository;
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestWord;
 import lombok.extern.slf4j.Slf4j;
-import org.javers.core.Changes;
-import org.javers.core.commit.CommitMetadata;
-import org.javers.core.diff.changetype.PropertyChange;
-import org.javers.core.metamodel.object.CdoSnapshot;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,51 +22,8 @@ public class Helper {
 
     private final AuditMappedRepository auditMappedRepository;
 
-    public List<AuditLog> customizeAuditDetails(Changes changes, List<CdoSnapshot> snapshots) {
-
-        // Map commitId (majorId) to version
-        Map<String, Long> commitIdToVersion = snapshots.stream()
-                .collect(Collectors.toMap(snapshot -> snapshot.getCommitMetadata().getId().toString(), CdoSnapshot::getVersion));
-
-        List<AuditLog> mappedList = new ArrayList<>();
-
-        changes.forEach(j -> {
-
-            if (j.getCommitMetadata().isPresent()) {
-                CommitMetadata commitMetadata = j.getCommitMetadata().get();
-                String entityName = j.getAffectedGlobalId().getTypeName().substring(j.getAffectedGlobalId().getTypeName().lastIndexOf('.') + 1);
-
-                // Use stream to find the matching majorId and get the version
-                Long version = commitIdToVersion.getOrDefault(commitMetadata.getId().toString(), -1L);
-
-                /* Get class name */
-                String type = j.getClass().getSimpleName();
-
-                /* Map only certain types and skip certain types for simplification */
-                if ("TerminalValueChange".equals(type) || "InitialValueChange".equals(type))
-                    return;
-                AuditLog mapped = AuditLog.builder()
-                        .commitId(new BigDecimal(commitMetadata.getId().toString()))
-                        .commitDate(commitMetadata.getCommitDate())
-                        .id(Integer.valueOf(j.getAffectedLocalId().toString()))
-                        .author(commitMetadata.getAuthor())
-                        .type(type)
-                        .entity(entityName)
-                        .version(version)
-                        .build();
-
-                /* Add additional info for field changes */
-                if ("ValueChange".equals(type)) {
-                    PropertyChange<?> change = (PropertyChange<?>) j;
-                    mapped.setOldValue(change.getLeft().toString());
-                    mapped.setNewValue(change.getRight().toString());
-                    mapped.setFieldName(change.getPropertyName());
-                }
-                mappedList.add(mapped);
-            }
-        });
-        auditMappedRepository.saveAll(mappedList);
-        return mappedList;
+    public List<AuditLog> customizeAuditDetails(){
+        return null;
     }
 
     public void exportAsText(List<AuditLog> records) {
