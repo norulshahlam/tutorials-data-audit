@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "AUDIT_MAPPED")
 @JsonPropertyOrder({"commit","commitId","version"})
-public class AuditMapped {
+public class AuditLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer commit;

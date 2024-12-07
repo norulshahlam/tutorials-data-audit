@@ -1,14 +1,11 @@
 package com.example.userregistration.controller;
 
-import com.example.userregistration.entity.AuditMapped;
+import com.example.userregistration.entity.AuditLog;
 import com.example.userregistration.entity.BookingEntity;
 import com.example.userregistration.entity.ContactEntity;
-import com.example.userregistration.repository.AuditMappedRepository;
 import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.service.JaversService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.vandermeer.asciitable.AsciiTable;
-import de.vandermeer.asciitable.CWC_LongestWord;
+import com.example.userregistration.utils.Helper;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,11 +16,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.javers.common.string.PrettyValuePrinter;
-import org.javers.core.*;
+import org.javers.core.Changes;
+import org.javers.core.ChangesByCommit;
+import org.javers.core.Javers;
+import org.javers.core.JaversCoreProperties;
 import org.javers.core.commit.CommitId;
-import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.Change;
-import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
@@ -32,30 +30,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping(value = "/audit")
 @Slf4j
 public class AuditController {
 
+    private final Helper helper;
     private final Javers javers;
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final BookingRepository bookingRepository;
     private final JaversService javersService;
-    private final AuditMappedRepository auditMappedRepository;
 
-    public AuditController(Javers javers, BookingRepository bookingRepository, JaversService javersService, AuditMappedRepository auditMappedRepository) {
+    public AuditController(Helper helper, Javers javers, BookingRepository bookingRepository, JaversService javersService) {
+        this.helper = helper;
         this.javers = javers;
         this.bookingRepository = bookingRepository;
         this.javersService = javersService;
-        this.auditMappedRepository = auditMappedRepository;
     }
+
 
     @GetMapping("/booking")
     public ResponseEntity<String> getBookingEntityChanges() {
@@ -99,14 +94,14 @@ public class AuditController {
     @GetMapping("/contactsPretty")
     @Operation(summary = "Get all contact audit",
             description = "This endpoint will Get all contact audit")
-    public ResponseEntity<List<AuditMapped>> getContractEntityChangesPrettyAll() {
+    public ResponseEntity<List<AuditLog>> getContractEntityChangesPrettyAll() {
         QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
         List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
 
         if (!changes.isEmpty()) {
-            List<AuditMapped> mappedList = customizeAuditDetails(changes, snapshots);
-            exportAsText(mappedList);
+            List<AuditLog> mappedList = helper.customizeAuditDetails(changes, snapshots);
+            helper.exportAsText(mappedList);
 //            mappedList.forEach(i -> log.info("mappedList: \n{}", i));
             return ResponseEntity.ok().body(mappedList);
         }
@@ -237,93 +232,5 @@ public class AuditController {
         changes.addAll(contractChanges);
     }
 
-    private List<AuditMapped> customizeAuditDetails(Changes changes, List<CdoSnapshot> snapshots) {
-
-        // Map commitId (majorId) to version
-        Map<String, Long> commitIdToVersion = snapshots.stream()
-                .collect(Collectors.toMap(snapshot -> snapshot.getCommitMetadata().getId().toString(), CdoSnapshot::getVersion));
-
-        List<AuditMapped> mappedList = new ArrayList<>();
-
-        changes.forEach(j -> {
-
-            if (j.getCommitMetadata().isPresent()) {
-                CommitMetadata commitMetadata = j.getCommitMetadata().get();
-                String entityName = j.getAffectedGlobalId().getTypeName().substring(j.getAffectedGlobalId().getTypeName().lastIndexOf('.') + 1);
-
-                // Use stream to find the matching majorId and get the version
-                Long version = commitIdToVersion.getOrDefault(commitMetadata.getId().toString(), -1L);
-
-                /* Get class name */
-                String type = j.getClass().getSimpleName();
-
-                /* Map only certain types and skip certain types for simplification */
-                if ("TerminalValueChange".equals(type) || "InitialValueChange".equals(type))
-                    return;
-                AuditMapped mapped = AuditMapped.builder()
-                        .commitId(new BigDecimal(commitMetadata.getId().toString()))
-                        .commitDate(commitMetadata.getCommitDate())
-                        .id(Integer.valueOf(j.getAffectedLocalId().toString()))
-                        .author(commitMetadata.getAuthor())
-                        .type(type)
-                        .entity(entityName)
-                        .version(version)
-                        .build();
-
-                /* Add additional info for field changes */
-                if ("ValueChange".equals(type)) {
-                    PropertyChange<?> change = (PropertyChange<?>) j;
-                    mapped.setOldValue(change.getLeft().toString());
-                    mapped.setNewValue(change.getRight().toString());
-                    mapped.setFieldName(change.getPropertyName());
-                }
-                mappedList.add(mapped);
-            }
-        });
-        auditMappedRepository.saveAll(mappedList);
-        return mappedList;
-    }
-
-    private void exportAsText(List<AuditMapped> records) {
-        // Create an ASCII table
-        AsciiTable table = new AsciiTable();
-        table.getRenderer().setCWC(new CWC_LongestWord());
-        table.addRule();
-        table.addRow("commit", "id", "commitId", "commitDate",
-                "version", "author", "type",
-                "fieldName", "oldValue", "newValue", "entity");
-        table.addRule();
-
-        // Add rows to the table
-        for (AuditMapped record : records) {
-            table.addRow(
-                    record.getCommit() != null ? record.getCommit() : "",
-                    record.getId() != null ? record.getId() : "",
-                    record.getCommitId() != null ? record.getCommitId() : "",
-                    record.getCommitDate() != null ? record.getCommitDate() : "",
-                    record.getVersion() != null ? record.getVersion() : "",
-                    record.getAuthor() != null ? record.getAuthor() : "",
-                    record.getType() != null ? record.getType() : "",
-                    record.getFieldName() != null ? record.getFieldName() : "",
-                    record.getOldValue() != null ? record.getOldValue() : "",
-                    record.getNewValue() != null ? record.getNewValue() : "",
-                    record.getEntity() != null ? record.getEntity() : ""
-            );
-            table.addRule();
-        }
-
-        // Render the table
-        String tableString = table.render();
-
-        // Write the table to a text file
-        String path = "C:/Users/NORUL/Documents/GitHub/tutorials-data-audit/src/main/resources/data.txt";
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
-            writer.write(tableString);
-            log.info("File successfully written to: " + path);
-        } catch (IOException e) {
-            throw new RuntimeException("Error writing to file", e);
-        }
-        log.info("Saving to text file");
-    }
 
 }
