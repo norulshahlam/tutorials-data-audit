@@ -1,20 +1,19 @@
 package com.example.userregistration.entity;
 
-import com.example.userregistration.listener.AuditListener;
+import com.example.userregistration.listener.ContactAuditListener;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
 @Table(name = "CONTACT")
-@EntityListeners(AuditListener.class)
+@EntityListeners(ContactAuditListener.class)
 public class ContactEntity implements Serializable {
 
     public static final long serialVersionId = 1L;
