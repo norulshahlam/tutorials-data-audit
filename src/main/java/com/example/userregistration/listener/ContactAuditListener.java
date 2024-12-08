@@ -1,30 +1,28 @@
 package com.example.userregistration.listener;
 
-import com.example.userregistration.repository.AuditMappedRepository;
-import lombok.RequiredArgsConstructor;
+import com.example.userregistration.entity.ContactEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
+import javax.persistence.PostPersist;
+import javax.persistence.PostRemove;
+import javax.persistence.PostUpdate;
 
 @Slf4j
 public class ContactAuditListener {
 
 
-    @PreUpdate
-    public void onPreUpdate(Object entity) {
+    @PostUpdate
+    public void onPreUpdate(ContactEntity entity) {
         log.info("onPreUpdate: [{}]", entity);
     }
 
-    @PrePersist
-    public void onCreate(Object entity) {
+    @PostPersist
+    public void onCreate(ContactEntity entity) {
         log.info("onCreate: [{}]", entity);
     }
 
-    @PreRemove
-    public void onDelete(Object entity) {
+    @PostRemove
+    public void onDelete(ContactEntity entity) {
         log.info("onDelete: [{}]", entity);
     }
 
