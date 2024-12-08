@@ -2,12 +2,14 @@ package com.example.userregistration.listener;
 
 import com.example.userregistration.entity.ContactEntity;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
 
 @Slf4j
+@Service
 public class ContactAuditListener {
 
 
