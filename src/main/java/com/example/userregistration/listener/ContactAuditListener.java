@@ -1,7 +1,6 @@
 package com.example.userregistration.listener;
 
 import com.example.userregistration.entity.ContactEntity;
-import com.example.userregistration.repository.AuditMappedRepository;
 import com.example.userregistration.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,11 +14,9 @@ import javax.persistence.PostUpdate;
 public class ContactAuditListener {
 
     private final Helper helper;
-    private final AuditMappedRepository auditRepository;
 
-    public ContactAuditListener(Helper helper, AuditMappedRepository auditRepository) {
+    public ContactAuditListener(Helper helper) {
         this.helper = helper;
-        this.auditRepository = auditRepository;
     }
 
 

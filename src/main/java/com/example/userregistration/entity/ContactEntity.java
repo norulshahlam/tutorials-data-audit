@@ -16,6 +16,7 @@ import java.io.Serializable;
 @Builder
 @Entity
 @Table(name = "CONTACT")
+@EntityListeners(ContactAuditListener.class)
 public class ContactEntity implements Serializable {
 
     public static final long serialVersionId = 1L;
