@@ -1,6 +1,9 @@
 package com.example.userregistration.listener;
 
+import com.example.userregistration.repository.AuditMappedRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
@@ -8,6 +11,7 @@ import javax.persistence.PreUpdate;
 
 @Slf4j
 public class ContactAuditListener {
+
 
     @PreUpdate
     public void onPreUpdate(Object entity) {
