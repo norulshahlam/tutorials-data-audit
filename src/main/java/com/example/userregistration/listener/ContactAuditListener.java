@@ -1,6 +1,7 @@
 package com.example.userregistration.listener;
 
 import com.example.userregistration.entity.ContactEntity;
+import com.example.userregistration.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,11 @@ import javax.persistence.PostUpdate;
 @Service
 public class ContactAuditListener {
 
+    private final Helper helper;
+
+    public ContactAuditListener(Helper helper) {
+        this.helper = helper;
+    }
 
     @PostUpdate
     public void onPreUpdate(ContactEntity entity) {
