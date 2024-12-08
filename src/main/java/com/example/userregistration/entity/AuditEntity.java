@@ -1,5 +1,6 @@
 package com.example.userregistration.entity;
 
+import com.example.userregistration.listener.ContactAuditListener;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,6 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -18,7 +18,6 @@ import java.util.Date;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 public class AuditEntity {
 
 	@Column(name = "CREATED_BY", updatable = false)

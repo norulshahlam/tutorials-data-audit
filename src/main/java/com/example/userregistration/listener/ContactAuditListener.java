@@ -1,6 +1,7 @@
 package com.example.userregistration.listener;
 
 import com.example.userregistration.entity.ContactEntity;
+import com.example.userregistration.repository.AuditMappedRepository;
 import com.example.userregistration.utils.Helper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,24 +15,27 @@ import javax.persistence.PostUpdate;
 public class ContactAuditListener {
 
     private final Helper helper;
+    private final AuditMappedRepository auditRepository;
 
-    public ContactAuditListener(Helper helper) {
+    public ContactAuditListener(Helper helper, AuditMappedRepository auditRepository) {
         this.helper = helper;
+        this.auditRepository = auditRepository;
     }
 
+
     @PostUpdate
-    public void onPreUpdate(ContactEntity entity) {
-        log.info("onPreUpdate: [{}]", entity);
+    public void onPostUpdate(ContactEntity entity) {
+        log.info("onPostUpdate: [{}]", entity);
     }
 
     @PostPersist
-    public void onCreate(ContactEntity entity) {
-        log.info("onCreate: [{}]", entity);
+    public void onPostPersist(ContactEntity entity) {
+        log.info("onPostPersist: [{}]", entity);
     }
 
     @PostRemove
-    public void onDelete(ContactEntity entity) {
-        log.info("onDelete: [{}]", entity);
+    public void onPostRemove(ContactEntity entity) {
+        log.info("onPostRemove: [{}]", entity);
     }
 
 }
