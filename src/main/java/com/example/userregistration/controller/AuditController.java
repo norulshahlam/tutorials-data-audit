@@ -1,6 +1,6 @@
 package com.example.userregistration.controller;
 
-import com.example.userregistration.entity.AuditLog;
+import com.example.userregistration.entity.AuditMappedEntity;
 import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.utils.Helper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,18 +19,18 @@ import java.util.List;
 @Slf4j
 public class AuditController {
 
-    private final Helper helper;
+    private Helper helper;
     private final BookingRepository bookingRepository;
 
-    public AuditController(Helper helper, BookingRepository bookingRepository) {
-        this.helper = helper;
+    public AuditController(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;
     }
+
 
     @GetMapping("/contactsPretty")
     @Operation(summary = "Get all contact audit",
             description = "This endpoint will Get all contact audit")
-    public ResponseEntity<List<AuditLog>> getContractEntityChangesPrettyAll() {
+    public ResponseEntity<List<AuditMappedEntity>> getContractEntityChangesPrettyAll() {
 
         return ResponseEntity.ok(new ArrayList<>());
     }

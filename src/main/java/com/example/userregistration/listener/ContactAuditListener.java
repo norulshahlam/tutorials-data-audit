@@ -1,7 +1,8 @@
 package com.example.userregistration.listener;
 
 import com.example.userregistration.entity.ContactEntity;
-import com.example.userregistration.utils.Helper;
+import com.example.userregistration.service.ContactAuditService;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -13,15 +14,13 @@ import javax.persistence.PostUpdate;
 @Service
 public class ContactAuditListener {
 
-    private final Helper helper;
-
-    public ContactAuditListener(Helper helper) {
-        this.helper = helper;
-    }
+    @Setter
+    private static ContactAuditService contactAuditService;
 
 
     @PostUpdate
     public void onPostUpdate(ContactEntity entity) {
+        // use ContactAuditService to get old data of contactEntity and save field changes to
         log.info("onPostUpdate: [{}]", entity);
     }
 
@@ -33,6 +32,8 @@ public class ContactAuditListener {
     @PostRemove
     public void onPostRemove(ContactEntity entity) {
         log.info("onPostRemove: [{}]", entity);
+        contactAuditService.logDeleteContact(entity);
+
     }
 
 }

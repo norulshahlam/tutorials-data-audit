@@ -1,10 +1,9 @@
 package com.example.userregistration.utils;
 
-import com.example.userregistration.entity.AuditLog;
+import com.example.userregistration.entity.AuditMappedEntity;
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestWord;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -12,10 +11,9 @@ import java.io.IOException;
 import java.util.List;
 
 @Slf4j
-@Service
 public class Helper {
 
-    public void exportAsText(List<AuditLog> records) {
+    public void exportAsText(List<AuditMappedEntity> records) {
         // Create an ASCII table
         AsciiTable table = new AsciiTable();
         table.getRenderer().setCWC(new CWC_LongestWord());
@@ -26,7 +24,7 @@ public class Helper {
         table.addRule();
 
         // Add rows to the table
-        for (AuditLog record : records) {
+        for (AuditMappedEntity record : records) {
             table.addRow(
                     record.getCommit() != null ? record.getCommit() : "",
                     record.getId() != null ? record.getId() : "",
