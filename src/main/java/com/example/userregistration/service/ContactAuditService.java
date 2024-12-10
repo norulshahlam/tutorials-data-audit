@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -79,5 +80,9 @@ public class ContactAuditService {
                 .newValue(newValue)
                 .author("SomeUser") // Replace with actual user tracking logic if needed
                 .build();
+    }
+
+    public Optional<ContactEntity> findExistingContacts(ContactEntity entity) {
+        return contactRepository.findById(entity.getId());
     }
 }
