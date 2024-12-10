@@ -10,6 +10,7 @@ import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
 import javax.persistence.PreUpdate;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -30,15 +31,12 @@ public class ContactAuditListener {
 
     @PreUpdate
     public synchronized void onPreUpdate(ContactEntity entity) {
-        log.info("Audit::onPreUpdate: Capturing original state for entity: [{}]", entity);
         // Create a deep copy to store the original state
-        ContactEntity copy = ContactEntity.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .email(entity.getEmail())
-                .mobileNo(entity.getMobileNo())
-                .build();
-        originalState.set(copy);
+        Optional<ContactEntity> existingContacts = contactAuditServiceProvider.getIfAvailable().findExistingContacts(entity);
+        if (existingContacts.isPresent()) {
+            log.info("Audit::onPreUpdate: Capturing original state for entity: [{}]", existingContacts);
+            originalState.set(existingContacts.get());
+        }
     }
 
     @PostUpdate
