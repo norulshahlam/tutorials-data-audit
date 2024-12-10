@@ -58,6 +58,6 @@ public class TutorialsDataAuditApplication implements CommandLineRunner {
         List<ContactEntity> editedContacts = contactRepository.saveAll(savedContacts);
 
         log.info("Deleting 2 contact..");
-        contactRepository.deleteAll(editedContacts);
+//        contactRepository.deleteAll(editedContacts);
     }
 }
