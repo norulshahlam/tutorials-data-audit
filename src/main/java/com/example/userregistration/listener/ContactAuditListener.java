@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
+
 @Slf4j
 @Component
 public class ContactAuditListener {
