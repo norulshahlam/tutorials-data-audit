@@ -21,4 +21,12 @@ public class ContactAuditService {
     public void logDeleteContact(ContactEntity entity) {
         log.info("Deleting contact: [{}]", entity);
     }
+
+    public void logCreateContact(ContactEntity entity) {
+        log.info("Creating contact: [{}]", entity);
+    }
+
+    public void logUpdateContact(ContactEntity entity) {
+        log.info("Updating contact: [{}]", entity);
+    }
 }
