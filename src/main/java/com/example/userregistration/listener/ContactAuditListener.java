@@ -22,19 +22,19 @@ public class ContactAuditListener {
 
     @PostPersist
     public void onPostPersist(ContactEntity entity) {
-        log.info("onPostPersist: [{}]", entity);
+        log.info("Audit::onPostPersist: [{}]", entity);
         contactAuditServiceProvider.getIfAvailable().logCreateContact(entity);
     }
 
     @PostUpdate
     public void onPostUpdate(ContactEntity entity) {
-        log.info("onPostUpdate: [{}]", entity);
+        log.info("Audit::onPostUpdate: [{}]", entity);
         contactAuditServiceProvider.getIfAvailable().logUpdateContact(entity);
     }
 
     @PostRemove
     public void onPostRemove(ContactEntity entity) {
-        log.info("onPostRemove: [{}]", entity);
+        log.info("Audit::onPostRemove: [{}]", entity);
         contactAuditServiceProvider.getIfAvailable().logDeleteContact(entity);
     }
 }
