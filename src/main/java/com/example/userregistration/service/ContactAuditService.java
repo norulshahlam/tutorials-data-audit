@@ -20,10 +20,6 @@ public class ContactAuditService {
         this.contactRepository = contactRepository;
     }
 
-    public void logDeleteContact(ContactEntity entity) {
-        log.info("Deleting contact: [{}]", entity);
-    }
-
     public void logCreateContact(ContactEntity entity) {
         log.info("Creating contact: [{}]", entity);
     }
@@ -33,4 +29,9 @@ public class ContactAuditService {
         Optional<ContactEntity> byId = contactRepository.findById(entity.getId());
         byId.ifPresent(contactEntity -> log.info("Contact found: [{}]", contactEntity));
     }
+
+    public void logDeleteContact(ContactEntity entity) {
+        log.info("Deleting contact: [{}]", entity);
+    }
+
 }
