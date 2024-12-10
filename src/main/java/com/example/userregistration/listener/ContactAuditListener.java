@@ -14,23 +14,24 @@ import javax.persistence.PostUpdate;
 @Service
 public class ContactAuditListener {
 
-private final ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
     public ContactAuditListener(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
-
-    @PostUpdate
-    public void onPostUpdate(ContactEntity entity) {
-        // use ContactAuditService to get old data of contactEntity and save field changes to
-        log.info("onPostUpdate: [{}]", entity);
-    }
-
     @PostPersist
     public void onPostPersist(ContactEntity entity) {
         log.info("onPostPersist: [{}]", entity);
+        applicationContext.getBean(ContactAuditService.class).logCreateContact(entity);
     }
+
+    @PostUpdate
+    public void onPostUpdate(ContactEntity entity) {
+        log.info("onPostUpdate: [{}]", entity);
+        applicationContext.getBean(ContactAuditService.class).logUpdateContact(entity);
+    }
+
 
     @PostRemove
     public void onPostRemove(ContactEntity entity) {
