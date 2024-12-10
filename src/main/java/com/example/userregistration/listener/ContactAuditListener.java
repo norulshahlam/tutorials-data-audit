@@ -2,8 +2,8 @@ package com.example.userregistration.listener;
 
 import com.example.userregistration.entity.ContactEntity;
 import com.example.userregistration.service.ContactAuditService;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.PostPersist;
@@ -14,8 +14,11 @@ import javax.persistence.PostUpdate;
 @Service
 public class ContactAuditListener {
 
-    @Setter
-    private static ContactAuditService contactAuditService;
+private final ApplicationContext applicationContext;
+
+    public ContactAuditListener(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
 
     @PostUpdate
@@ -32,8 +35,7 @@ public class ContactAuditListener {
     @PostRemove
     public void onPostRemove(ContactEntity entity) {
         log.info("onPostRemove: [{}]", entity);
-        contactAuditService.logDeleteContact(entity);
-
+        applicationContext.getBean(ContactAuditService.class).logDeleteContact(entity);
     }
 
 }
