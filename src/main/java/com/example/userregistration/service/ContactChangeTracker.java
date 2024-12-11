@@ -1,94 +1,108 @@
 package com.example.userregistration.service;
 
-
 import com.example.userregistration.entity.ContactEntity;
 import com.example.userregistration.repository.ContactRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
-@Aspect
 @Component
+@Aspect
 public class ContactChangeTracker {
 
     @Autowired
     private ContactRepository contactRepository;
 
-    private static final ThreadLocal<ContactEntity> previousStateHolder = new ThreadLocal<>();
+    private static final ThreadLocal<Optional<ContactEntity>> previousStateHolder = ThreadLocal.withInitial(Optional::empty);
 
-    // Pointcut for save
-    @Pointcut("execution(* com.example.userregistration.repository.ContactRepository.save(..)) && args(contact)")
-    public void savePointcut(ContactEntity contact) {
-        System.out.println(1);
+    // Pointcut for createContact
+    @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.createContact(..)) && args(contact)")
+    public void createContactPointcut(ContactEntity contact) {}
+
+    // Pointcut for editContact
+    @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.editContact(..)) && args(contact)")
+    public void editContactPointcut(ContactEntity contact) {}
+
+    // Pointcut for deleteContact
+    @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.deleteContact(..)) && args(id)")
+    public void deleteContactPointcut(Long id) {}
+
+    // Before advice for createContact
+    @Before("createContactPointcut(contact)")
+    public void trackCreateContactBefore(ContactEntity contact) {
+        log.info("[BEFORE CREATE] Attempting to create ContactEntity: {}", contact);
     }
 
-    @Before("savePointcut(contact)")
-    public void capturePreviousStateForSave(ContactEntity contact) {
-        System.out.println(2);
+    // After advice for createContact
+    @After("createContactPointcut(contact)")
+    public void trackCreateContactAfter(ContactEntity contact) {
+        log.info("[CREATE] ID: {}, Time: {}", contact.getId(), LocalDateTime.now());
+    }
+
+    // Before advice for editContact
+    @Before("editContactPointcut(contact)")
+    public void trackEditContactBefore(ContactEntity contact) {
+        log.info("[BEFORE UPDATE] Capturing previous state for ContactEntity with ID: {}", contact.getEmail());
+
         if (contact.getId() != null) {
-            contactRepository.findById(contact.getId()).ifPresent(previousStateHolder::set);
-            log.info("previousStateHolder; [{}]", previousStateHolder.get());
-        }
-    }
+            Optional<ContactEntity> byId = contactRepository.findById(contact.getId());
 
-    @AfterReturning(pointcut = "savePointcut(contact)", returning = "result")
-    @Transactional
-    public void logSave(ContactEntity contact, ContactEntity result) {
-        System.out.println(3);
-        ContactEntity previousState = previousStateHolder.get();
-        if (previousState != null && !Objects.equals(previousState.getEmail(), result.getEmail())) {
-            log.info("[UPDATE] ID: {}, Time: {}, Field: email, Old Value: {}, New Value: {}",
-                    result.getId(), LocalDateTime.now(),
-                    previousState.getEmail(), result.getEmail());
-        } else if (previousState == null) {
-            log.info("[CREATE] ID: {}, Time: {}", result.getId(), LocalDateTime.now());
-        }
-        previousStateHolder.remove();
-    }
-
-
-
-
-    // Pointcut for saveAll
-    @Pointcut("execution(* com.example.userregistration.repository.ContactRepository.saveAll(..)) && args(contactEntities)")
-    public void saveAllPointcut(List<ContactEntity> contactEntities) {
-        System.out.println(4);
-    }
-
-    @AfterReturning(pointcut = "saveAllPointcut(contactEntities)", returning = "result")
-    @Transactional
-    public void logSaveAll(List<ContactEntity> contactEntities, List<ContactEntity> result) {
-        System.out.println(5);
-        for (ContactEntity savedEntity : result) {
-            if (savedEntity.getId() == null) {
-                log.info("[CREATE] ID: {}, Time: {}", savedEntity.getId(), LocalDateTime.now());
+            if (byId.isPresent()) {
+                // Deep copy before setting in ThreadLocal
+                ContactEntity previousState = deepCopy(byId.get());
+                previousStateHolder.set(Optional.of(previousState)); // Capture the state before edit
             }
         }
     }
 
+    // After advice for editContact
+    @After("editContactPointcut(contact)")
+    public void trackEditContactAfter(ContactEntity contact) {
+        Optional<ContactEntity> previousStateOpt = previousStateHolder.get();
+        if (previousStateOpt.isPresent()) {
+            ContactEntity previousState = previousStateOpt.get();
+            if (!Objects.equals(previousState.getEmail(), contact.getEmail())) {
+                log.info("[UPDATE] ID: {}, Time: {}, Field: email, Old Value: {}, New Value: {}",
+                        contact.getId(), LocalDateTime.now(),
+                        previousState.getEmail(), contact.getEmail());
+            }
+        }
 
-
-    // Pointcut for delete
-    @Pointcut("execution(* com.example.userregistration.repository.ContactRepository.delete(..)) && args(contact)")
-    public void deletePointcut(ContactEntity contact) {
-        System.out.println(6);
+        // Clear ThreadLocal after use
+        previousStateHolder.remove();
     }
 
-    @AfterReturning(pointcut = "deletePointcut(contact)")
-    public void logDelete(ContactEntity contact) {
-        System.out.println(7);
-        log.info("[DELETE] ID: {}, Time: {}", contact.getId(), LocalDateTime.now());
+    // Before advice for deleteContact
+    @Before("deleteContactPointcut(id)")
+    public void trackDeleteContactBefore(Long id) {
+        log.info("[BEFORE DELETE] Deleting ContactEntity with ID: {}", id);
+    }
+
+    // After advice for deleteContact
+    @After("deleteContactPointcut(id)")
+    public void trackDeleteContactAfter(Long id) {
+        log.info("[DELETE] ID: {}, Time: {}", id, LocalDateTime.now());
+    }
+
+    // Deep copy method for ContactEntity to prevent modifications
+    private ContactEntity deepCopy(ContactEntity original) {
+        // Create a new ContactEntity and copy values
+        ContactEntity copy = new ContactEntity();
+        copy.setId(original.getId());
+        copy.setEmail(original.getEmail());
+        copy.setName(original.getName());
+        copy.setMobileNo(original.getMobileNo());
+        // Add other fields here if needed
+
+        return copy;
     }
 }
-
-
