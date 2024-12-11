@@ -12,6 +12,8 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -27,9 +29,9 @@ public class ContactChangeTracker {
     private final ContactRepository contactRepository;
     private final AuditMappedRepository auditMappedRepository;
     private final ExecutorService auditExecutor = Executors.newFixedThreadPool(10);
-
-
     private static final ThreadLocal<Optional<ContactEntity>> previousStateHolder = ThreadLocal.withInitial(Optional::empty);
+    private static final ThreadLocal<HttpServletRequest> requestThreadLocal = new ThreadLocal<>();
+
 
     public ContactChangeTracker(ContactRepository contactRepository, AuditMappedRepository auditMappedRepository) {
         this.contactRepository = contactRepository;
@@ -100,6 +102,7 @@ public class ContactChangeTracker {
         // Clear ThreadLocal after use
         previousStateHolder.remove();
     }
+
     @Async
     public void logChangeAsync(ContactEntity contact, String fieldName, String type, String oldValue, String newValue) {
         auditExecutor.submit(() -> logChange(contact, fieldName, type, oldValue, newValue));
@@ -137,7 +140,7 @@ public class ContactChangeTracker {
     public void trackDeleteContactAfter(Long id) {
         ContactEntity contact = new ContactEntity();
         contact.setId(id);
-        logChangeAsync(contact, null,"DELETE", null, null);
+        logChangeAsync(contact, null, "DELETE", null, null);
     }
 
     // Deep copy method for ContactEntity to prevent modifications
@@ -148,5 +151,20 @@ public class ContactChangeTracker {
                 .name(original.getName())
                 .mobileNo(original.getMobileNo())
                 .build();
+    }
+
+    private String getUsernameFromCookie() {
+        HttpServletRequest request = requestThreadLocal.get();
+        if (request != null) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (cookie.getName().equals("username")) {
+                        return cookie.getValue();
+                    }
+                }
+            }
+        }
+        return null;
     }
 }
