@@ -9,12 +9,15 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @Component
@@ -23,6 +26,8 @@ public class ContactChangeTracker {
 
     private final ContactRepository contactRepository;
     private final AuditMappedRepository auditMappedRepository;
+    private final ExecutorService auditExecutor = Executors.newFixedThreadPool(10);
+
 
     private static final ThreadLocal<Optional<ContactEntity>> previousStateHolder = ThreadLocal.withInitial(Optional::empty);
 
@@ -55,7 +60,7 @@ public class ContactChangeTracker {
     // After advice for createContact
     @After("createContactPointcut(contact)")
     public void trackCreateContactAfter(ContactEntity contact) {
-        logChange(contact, null, "CREATE", null, null);
+        logChangeAsync(contact, null, "CREATE", null, null);
     }
 
     // Before advice for editContact
@@ -83,17 +88,21 @@ public class ContactChangeTracker {
 
             // Check and log changes for email
             if (!Objects.equals(previousState.getEmail(), contact.getEmail())) {
-                logChange(contact, "email", "UPDATE", previousState.getEmail(), contact.getEmail());
+                logChangeAsync(contact, "email", "UPDATE", previousState.getEmail(), contact.getEmail());
             }
 
             // Check and log changes for mobileNo
             if (!Objects.equals(previousState.getMobileNo(), contact.getMobileNo())) {
-                logChange(contact, "mobileNo", "UPDATE", previousState.getMobileNo(), contact.getMobileNo());
+                logChangeAsync(contact, "mobileNo", "UPDATE", previousState.getMobileNo(), contact.getMobileNo());
             }
         }
 
         // Clear ThreadLocal after use
         previousStateHolder.remove();
+    }
+    @Async
+    public void logChangeAsync(ContactEntity contact, String fieldName, String type, String oldValue, String newValue) {
+        auditExecutor.submit(() -> logChange(contact, fieldName, type, oldValue, newValue));
     }
 
     private void logChange(ContactEntity contact, String fieldName, String type, String oldValue, String newValue) {
@@ -127,7 +136,7 @@ public class ContactChangeTracker {
     public void trackDeleteContactAfter(Long id) {
         ContactEntity contact = new ContactEntity();
         contact.setId(id);
-        logChange(contact, null,"DELETE", null, null);
+        logChangeAsync(contact, null,"DELETE", null, null);
     }
 
     // Deep copy method for ContactEntity to prevent modifications
