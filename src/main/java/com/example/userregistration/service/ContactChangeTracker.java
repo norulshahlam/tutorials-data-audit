@@ -110,7 +110,7 @@ public class ContactChangeTracker {
         log.info("[{}] ID: {}, Time: {}, Field: {}, Old Value: {}, New Value: {}",
                 type, contact.getId(), LocalDateTime.now(), fieldName, oldValue, newValue);
 
-        AuditMappedEntity.AuditMappedEntityBuilder auditBuilder = AuditMappedEntity.builder()
+        AuditMappedEntity auditBuilder = AuditMappedEntity.builder()
                 .id(contact.getId() != null ? Math.toIntExact(contact.getId()) : null)
                 .commitId(BigDecimal.valueOf(System.currentTimeMillis()))
                 .commitDate(LocalDateTime.now())
@@ -120,9 +120,10 @@ public class ContactChangeTracker {
                 .fieldName(fieldName)
                 .oldValue(oldValue)
                 .newValue(newValue)
-                .entity(contact.getClass().getSimpleName());
+                .entity(contact.getClass().getSimpleName())
+                .build();
 
-        auditMappedRepository.save(auditBuilder.build());
+        auditMappedRepository.save(auditBuilder);
     }
 
     // Before advice for deleteContact
