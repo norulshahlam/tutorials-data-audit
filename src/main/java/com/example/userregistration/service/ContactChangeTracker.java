@@ -21,7 +21,6 @@ import java.util.Optional;
 @Aspect
 public class ContactChangeTracker {
 
-
     private final ContactRepository contactRepository;
     private final AuditMappedRepository auditMappedRepository;
 
@@ -92,31 +91,40 @@ public class ContactChangeTracker {
         Optional<ContactEntity> previousStateOpt = previousStateHolder.get();
         if (previousStateOpt.isPresent()) {
             ContactEntity previousState = previousStateOpt.get();
+
+            // Check and log changes for email
             if (!Objects.equals(previousState.getEmail(), contact.getEmail())) {
-                log.info("[UPDATE] ID: {}, Time: {}, Field: email, Old Value: {}, New Value: {}",
-                        contact.getId(), LocalDateTime.now(),
-                        previousState.getEmail(), contact.getEmail());
+                logChange(contact, "email", previousState.getEmail(), contact.getEmail());
+            }
 
-                // Save Audit Record for Update
-                AuditMappedEntity audit = AuditMappedEntity.builder()
-                        .id(Math.toIntExact(contact.getId()))
-                        .commitId(BigDecimal.valueOf(System.currentTimeMillis()))
-                        .commitDate(LocalDateTime.now())
-                        .version(1L) // You can generate version dynamically or use a field from the entity
-                        .author("system") // Replace with the actual author from cookie or session
-                        .type("UPDATE")
-                        .fieldName("email")
-                        .oldValue(previousState.getEmail())
-                        .newValue(contact.getEmail())
-                        .entity("ContactEntity")
-                        .build();
-
-                auditMappedRepository.save(audit);
+            // Check and log changes for mobileNo
+            if (!Objects.equals(previousState.getMobileNo(), contact.getMobileNo())) {
+                logChange(contact, "mobileNo", previousState.getMobileNo(), contact.getMobileNo());
             }
         }
 
         // Clear ThreadLocal after use
         previousStateHolder.remove();
+    }
+
+    private void logChange(ContactEntity contact, String fieldName, String oldValue, String newValue) {
+        log.info("[UPDATE] ID: {}, Time: {}, Field: {}, Old Value: {}, New Value: {}",
+                contact.getId(), LocalDateTime.now(), fieldName, oldValue, newValue);
+
+        AuditMappedEntity audit = AuditMappedEntity.builder()
+                .id(Math.toIntExact(contact.getId()))
+                .commitId(BigDecimal.valueOf(System.currentTimeMillis()))
+                .commitDate(LocalDateTime.now())
+                .version(1L) // You can generate version dynamically or use a field from the entity
+                .author("system") // Replace with the actual author from cookie or session
+                .type("UPDATE")
+                .fieldName(fieldName)
+                .oldValue(oldValue)
+                .newValue(newValue)
+                .entity("ContactEntity")
+                .build();
+
+        auditMappedRepository.save(audit);
     }
 
     // Before advice for deleteContact
