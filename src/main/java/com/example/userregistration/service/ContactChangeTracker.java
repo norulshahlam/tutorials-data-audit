@@ -1,15 +1,17 @@
 package com.example.userregistration.service;
 
+import com.example.userregistration.entity.AuditMappedEntity;
 import com.example.userregistration.entity.ContactEntity;
+import com.example.userregistration.repository.AuditMappedRepository;
 import com.example.userregistration.repository.ContactRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,10 +21,16 @@ import java.util.Optional;
 @Aspect
 public class ContactChangeTracker {
 
-    @Autowired
-    private ContactRepository contactRepository;
+
+    private final ContactRepository contactRepository;
+    private final AuditMappedRepository auditMappedRepository;
 
     private static final ThreadLocal<Optional<ContactEntity>> previousStateHolder = ThreadLocal.withInitial(Optional::empty);
+
+    public ContactChangeTracker(ContactRepository contactRepository, AuditMappedRepository auditMappedRepository) {
+        this.contactRepository = contactRepository;
+        this.auditMappedRepository = auditMappedRepository;
+    }
 
     // Pointcut for createContact
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.createContact(..)) && args(contact)")
@@ -49,6 +57,17 @@ public class ContactChangeTracker {
     @After("createContactPointcut(contact)")
     public void trackCreateContactAfter(ContactEntity contact) {
         log.info("[CREATE] ID: {}, Time: {}", contact.getId(), LocalDateTime.now());
+        AuditMappedEntity audit = AuditMappedEntity.builder()
+                .id(Math.toIntExact(contact.getId()))
+                .commitId(BigDecimal.valueOf(System.currentTimeMillis()))
+                .commitDate(LocalDateTime.now())
+                .version(1L) // You can generate version dynamically or use a field from the entity
+                .author("system") // Replace with the actual author from cookie or session
+                .type("CREATE")
+                .entity("ContactEntity")
+                .build();
+
+        auditMappedRepository.save(audit);
     }
 
     // Before advice for editContact
@@ -77,6 +96,22 @@ public class ContactChangeTracker {
                 log.info("[UPDATE] ID: {}, Time: {}, Field: email, Old Value: {}, New Value: {}",
                         contact.getId(), LocalDateTime.now(),
                         previousState.getEmail(), contact.getEmail());
+
+                // Save Audit Record for Update
+                AuditMappedEntity audit = AuditMappedEntity.builder()
+                        .id(Math.toIntExact(contact.getId()))
+                        .commitId(BigDecimal.valueOf(System.currentTimeMillis()))
+                        .commitDate(LocalDateTime.now())
+                        .version(1L) // You can generate version dynamically or use a field from the entity
+                        .author("system") // Replace with the actual author from cookie or session
+                        .type("UPDATE")
+                        .fieldName("email")
+                        .oldValue(previousState.getEmail())
+                        .newValue(contact.getEmail())
+                        .entity("ContactEntity")
+                        .build();
+
+                auditMappedRepository.save(audit);
             }
         }
 
