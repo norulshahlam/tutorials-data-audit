@@ -22,9 +22,9 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public ContactEntity createContact(ContactEntity request) {
+    public ContactEntity createContact(ContactEntity contactEntity) {
         log.info("in ContactServiceImpl::createContact");
-        return contactRepository.save(request);
+        return contactRepository.save(contactEntity);
     }
 
     @Override
@@ -52,14 +52,14 @@ public class ContactServiceImpl implements ContactService {
     public ContactEntity editContact(ContactEntity contact) {
         Optional<ContactEntity> result = contactRepository.findById(contact.getId());
 
+        log.info("in ContactServiceImpl::editContact");
         if (result.isPresent()) {
-            log.info("in ContactServiceImpl::editContact");
             ContactEntity contactEntity = result.get();
-            log.info("contactEntity: " + contactEntity);
-
             BeanUtils.copyProperties(contact, contactEntity, "id");
 
-            return contactRepository.save(contactEntity);
+            ContactEntity updated = contactRepository.save(contactEntity);
+            log.info("Contact updated successfully");
+            return updated;
         }
         throw new NoResultException("Contact to be edited not found");
     }
