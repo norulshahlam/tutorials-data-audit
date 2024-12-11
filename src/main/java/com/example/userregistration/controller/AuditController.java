@@ -1,6 +1,6 @@
 package com.example.userregistration.controller;
 
-import com.example.userregistration.entity.AuditLog;
+import com.example.userregistration.entity.AuditMappedEntity;
 import com.example.userregistration.entity.BookingEntity;
 import com.example.userregistration.entity.ContactEntity;
 import com.example.userregistration.repository.BookingRepository;
@@ -94,13 +94,13 @@ public class AuditController {
     @GetMapping("/contactsPretty")
     @Operation(summary = "Get all contact audit",
             description = "This endpoint will Get all contact audit")
-    public ResponseEntity<List<AuditLog>> getContractEntityChangesPrettyAll() {
+    public ResponseEntity<List<AuditMappedEntity>> getContractEntityChangesPrettyAll() {
         QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
         Changes changes = javers.findChanges(jqlQuery.build());
         List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
 
         if (!changes.isEmpty()) {
-            List<AuditLog> mappedList = helper.customizeAuditDetails(changes, snapshots);
+            List<AuditMappedEntity> mappedList = helper.customizeAuditDetails(changes, snapshots);
             helper.exportAsText(mappedList);
 //            mappedList.forEach(i -> log.info("mappedList: \n{}", i));
             return ResponseEntity.ok().body(mappedList);

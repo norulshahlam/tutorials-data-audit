@@ -89,9 +89,8 @@
         </dependency>
         <dependency>
             <groupId>org.javers</groupId>
-            <artifactId>javers-core</artifactId>
-            <version>7.3.6</version>
-            <scope>compile</scope>
+            <artifactId>javers-spring-boot-starter-sql</artifactId>
+            <version>6.14.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.gavlyukovskiy</groupId>

@@ -3,6 +3,7 @@ package com.example.userregistration.controller;
 import com.example.userregistration.entity.BookingEntity;
 import com.example.userregistration.entity.ContactEntity;
 import com.example.userregistration.service.BookingService;
+import com.example.userregistration.service.ContactService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -42,6 +43,7 @@ import javax.validation.constraints.NotBlank;
 public class BookingController {
 
     private final BookingService service;
+    private final ContactService contactService;
 
     @ApiResponse(responseCode = "200", description = "Booking created",
             content = @Content(mediaType = "application/json"))
@@ -98,7 +100,7 @@ public class BookingController {
     public ResponseEntity<ContactEntity> createContact(@Valid @RequestBody @NotBlank ContactEntity request) {
 
         log.info("in BookingController::createContact");
-        ContactEntity booking = service.createContact(request);
+        ContactEntity booking = contactService.createContact(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(booking);
     }
 
@@ -110,7 +112,7 @@ public class BookingController {
     public ResponseEntity<ContactEntity> fetchContact(@PathVariable Long id) {
 
         log.info("in BookingController::fetchContact");
-        ContactEntity booking = service.fetchContact(id);
+        ContactEntity booking = contactService.fetchContact(id);
         return ResponseEntity.status(HttpStatus.OK).body(booking);
     }
 
@@ -122,7 +124,7 @@ public class BookingController {
     public ResponseEntity<ContactEntity> editContact(@Valid @RequestBody @NotBlank ContactEntity request) {
         log.info("in BookingController::editContact");
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.editContact(request));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(contactService.editContact(request));
     }
 
     @ApiResponse(responseCode = "200", description = "Contact deleted",
@@ -133,6 +135,6 @@ public class BookingController {
     public ResponseEntity<String> deleteContact(@PathVariable Long id) {
         log.info("in BookingController::deleteContact");
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.deleteContact(id));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(contactService.deleteContact(id));
     }
 }

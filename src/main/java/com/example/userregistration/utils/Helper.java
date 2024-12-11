@@ -1,6 +1,6 @@
 package com.example.userregistration.utils;
 
-import com.example.userregistration.entity.AuditLog;
+import com.example.userregistration.entity.AuditMappedEntity;
 import com.example.userregistration.repository.AuditMappedRepository;
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestWord;
@@ -30,13 +30,13 @@ public class Helper {
 
     private final AuditMappedRepository auditMappedRepository;
 
-    public List<AuditLog> customizeAuditDetails(Changes changes, List<CdoSnapshot> snapshots) {
+    public List<AuditMappedEntity> customizeAuditDetails(Changes changes, List<CdoSnapshot> snapshots) {
 
         // Map commitId (majorId) to version
         Map<String, Long> commitIdToVersion = snapshots.stream()
                 .collect(Collectors.toMap(snapshot -> snapshot.getCommitMetadata().getId().toString(), CdoSnapshot::getVersion));
 
-        List<AuditLog> mappedList = new ArrayList<>();
+        List<AuditMappedEntity> mappedList = new ArrayList<>();
 
         changes.forEach(j -> {
 
@@ -53,7 +53,7 @@ public class Helper {
                 /* Map only certain types and skip certain types for simplification */
                 if ("TerminalValueChange".equals(type) || "InitialValueChange".equals(type))
                     return;
-                AuditLog mapped = AuditLog.builder()
+                AuditMappedEntity mapped = AuditMappedEntity.builder()
                         .commitId(new BigDecimal(commitMetadata.getId().toString()))
                         .commitDate(commitMetadata.getCommitDate())
                         .id(Integer.valueOf(j.getAffectedLocalId().toString()))
@@ -77,7 +77,7 @@ public class Helper {
         return mappedList;
     }
 
-    public void exportAsText(List<AuditLog> records) {
+    public void exportAsText(List<AuditMappedEntity> records) {
         // Create an ASCII table
         AsciiTable table = new AsciiTable();
         table.getRenderer().setCWC(new CWC_LongestWord());
@@ -88,7 +88,7 @@ public class Helper {
         table.addRule();
 
         // Add rows to the table
-        for (AuditLog record : records) {
+        for (AuditMappedEntity record : records) {
             table.addRow(
                     record.getCommit() != null ? record.getCommit() : "",
                     record.getId() != null ? record.getId() : "",
@@ -118,5 +118,6 @@ public class Helper {
         }
         log.info("Saving to text file");
     }
+
 
 }
