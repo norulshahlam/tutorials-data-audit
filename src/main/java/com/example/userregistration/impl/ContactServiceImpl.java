@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.NoResultException;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -22,7 +23,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public ContactEntity createContact(ContactEntity request) {
-        log.info("in BookingServiceImpl::createContact");
+        log.info("in ContactServiceImpl::createContact");
         return contactRepository.save(request);
     }
 
@@ -52,7 +53,7 @@ public class ContactServiceImpl implements ContactService {
         Optional<ContactEntity> result = contactRepository.findById(contact.getId());
 
         if (result.isPresent()) {
-            log.info("in BookingServiceImpl::editContact");
+            log.info("in ContactServiceImpl::editContact");
             ContactEntity contactEntity = result.get();
             log.info("contactEntity: " + contactEntity);
 
@@ -63,4 +64,8 @@ public class ContactServiceImpl implements ContactService {
         throw new NoResultException("Contact to be edited not found");
     }
 
+    @Override
+    public List<ContactEntity> saveMultipleContacts(List<ContactEntity> contactEntities) {
+        return contactRepository.saveAll(contactEntities);
+    }
 }
