@@ -6,6 +6,8 @@ import com.example.userregistration.service.BookingService;
 import com.example.userregistration.service.ContactService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -94,8 +96,9 @@ public class BookingController {
 
     @ApiResponse(responseCode = "200", description = "contact created",
             content = @Content(mediaType = "application/json"))
-    @Operation(summary = "Create new contact",
-            description = "This endpoint will Create new contact based on the given input data")
+    @Operation(summary = "Create new contact", parameters = {
+            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "username=shah")
+    }, description = "This endpoint will Create new contact based on the given input data")
     @PostMapping("createContact")
     public ResponseEntity<ContactEntity> createContact(@Valid @RequestBody @NotBlank ContactEntity request) {
 
