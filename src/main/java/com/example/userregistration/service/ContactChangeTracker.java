@@ -32,30 +32,19 @@ public class ContactChangeTracker {
         System.out.println(1);
     }
 
-    // Pointcut for saveAll
-    @Pointcut("execution(* com.example.userregistration.repository.ContactRepository.saveAll(..)) && args(contactEntities)")
-    public void saveAllPointcut(List<ContactEntity> contactEntities) {
-        System.out.println(2);
-    }
-
-    // Pointcut for delete
-    @Pointcut("execution(* com.example.userregistration.repository.ContactRepository.delete(..)) && args(contact)")
-    public void deletePointcut(ContactEntity contact) {
-        System.out.println(3);
-    }
-
     @Before("savePointcut(contact)")
     public void capturePreviousStateForSave(ContactEntity contact) {
-        System.out.println(4);
+        System.out.println(2);
         if (contact.getId() != null) {
             contactRepository.findById(contact.getId()).ifPresent(previousStateHolder::set);
+            log.info("previousStateHolder; [{}]", previousStateHolder.get());
         }
     }
 
     @AfterReturning(pointcut = "savePointcut(contact)", returning = "result")
     @Transactional
     public void logSave(ContactEntity contact, ContactEntity result) {
-        System.out.println(5);
+        System.out.println(3);
         ContactEntity previousState = previousStateHolder.get();
         if (previousState != null && !Objects.equals(previousState.getEmail(), result.getEmail())) {
             log.info("[UPDATE] ID: {}, Time: {}, Field: email, Old Value: {}, New Value: {}",
@@ -67,15 +56,32 @@ public class ContactChangeTracker {
         previousStateHolder.remove();
     }
 
+
+
+
+    // Pointcut for saveAll
+    @Pointcut("execution(* com.example.userregistration.repository.ContactRepository.saveAll(..)) && args(contactEntities)")
+    public void saveAllPointcut(List<ContactEntity> contactEntities) {
+        System.out.println(4);
+    }
+
     @AfterReturning(pointcut = "saveAllPointcut(contactEntities)", returning = "result")
     @Transactional
     public void logSaveAll(List<ContactEntity> contactEntities, List<ContactEntity> result) {
-        System.out.println(6);
+        System.out.println(5);
         for (ContactEntity savedEntity : result) {
             if (savedEntity.getId() == null) {
                 log.info("[CREATE] ID: {}, Time: {}", savedEntity.getId(), LocalDateTime.now());
             }
         }
+    }
+
+
+
+    // Pointcut for delete
+    @Pointcut("execution(* com.example.userregistration.repository.ContactRepository.delete(..)) && args(contact)")
+    public void deletePointcut(ContactEntity contact) {
+        System.out.println(6);
     }
 
     @AfterReturning(pointcut = "deletePointcut(contact)")
