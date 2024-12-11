@@ -55,18 +55,7 @@ public class ContactChangeTracker {
     // After advice for createContact
     @After("createContactPointcut(contact)")
     public void trackCreateContactAfter(ContactEntity contact) {
-        log.info("[CREATE] ID: {}, Time: {}", contact.getId(), LocalDateTime.now());
-        AuditMappedEntity audit = AuditMappedEntity.builder()
-                .id(Math.toIntExact(contact.getId()))
-                .commitId(BigDecimal.valueOf(System.currentTimeMillis()))
-                .commitDate(LocalDateTime.now())
-                .version(1L) // You can generate version dynamically or use a field from the entity
-                .author("system") // Replace with the actual author from cookie or session
-                .type("CREATE")
-                .entity("ContactEntity")
-                .build();
-
-        auditMappedRepository.save(audit);
+        logChange(contact, null, "CREATE", null, null);
     }
 
     // Before advice for editContact
@@ -94,12 +83,12 @@ public class ContactChangeTracker {
 
             // Check and log changes for email
             if (!Objects.equals(previousState.getEmail(), contact.getEmail())) {
-                logChange(contact, "email", previousState.getEmail(), contact.getEmail());
+                logChange(contact, "email", "UPDATE", previousState.getEmail(), contact.getEmail());
             }
 
             // Check and log changes for mobileNo
             if (!Objects.equals(previousState.getMobileNo(), contact.getMobileNo())) {
-                logChange(contact, "mobileNo", previousState.getMobileNo(), contact.getMobileNo());
+                logChange(contact, "mobileNo", "UPDATE", previousState.getMobileNo(), contact.getMobileNo());
             }
         }
 
@@ -107,24 +96,24 @@ public class ContactChangeTracker {
         previousStateHolder.remove();
     }
 
-    private void logChange(ContactEntity contact, String fieldName, String oldValue, String newValue) {
-        log.info("[UPDATE] ID: {}, Time: {}, Field: {}, Old Value: {}, New Value: {}",
-                contact.getId(), LocalDateTime.now(), fieldName, oldValue, newValue);
+    private void logChange(ContactEntity contact, String fieldName, String type, String oldValue, String newValue) {
 
-        AuditMappedEntity audit = AuditMappedEntity.builder()
-                .id(Math.toIntExact(contact.getId()))
+        log.info("[{}] ID: {}, Time: {}, Field: {}, Old Value: {}, New Value: {}",
+                type, contact.getId(), LocalDateTime.now(), fieldName, oldValue, newValue);
+
+        AuditMappedEntity.AuditMappedEntityBuilder auditBuilder = AuditMappedEntity.builder()
+                .id(contact.getId() != null ? Math.toIntExact(contact.getId()) : null)
                 .commitId(BigDecimal.valueOf(System.currentTimeMillis()))
                 .commitDate(LocalDateTime.now())
                 .version(1L) // You can generate version dynamically or use a field from the entity
                 .author("system") // Replace with the actual author from cookie or session
-                .type("UPDATE")
+                .type(type)
                 .fieldName(fieldName)
                 .oldValue(oldValue)
                 .newValue(newValue)
-                .entity("ContactEntity")
-                .build();
+                .entity(contact.getClass().getSimpleName());
 
-        auditMappedRepository.save(audit);
+        auditMappedRepository.save(auditBuilder.build());
     }
 
     // Before advice for deleteContact
@@ -136,7 +125,9 @@ public class ContactChangeTracker {
     // After advice for deleteContact
     @After("deleteContactPointcut(id)")
     public void trackDeleteContactAfter(Long id) {
-        log.info("[DELETE] ID: {}, Time: {}", id, LocalDateTime.now());
+        ContactEntity contact = new ContactEntity();
+        contact.setId(id);
+        logChange(contact, null,"DELETE", null, null);
     }
 
     // Deep copy method for ContactEntity to prevent modifications
