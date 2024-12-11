@@ -26,15 +26,18 @@ public class ContactChangeTracker {
 
     // Pointcut for createContact
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.createContact(..)) && args(contact)")
-    public void createContactPointcut(ContactEntity contact) {}
+    public void createContactPointcut(ContactEntity contact) {
+    }
 
     // Pointcut for editContact
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.editContact(..)) && args(contact)")
-    public void editContactPointcut(ContactEntity contact) {}
+    public void editContactPointcut(ContactEntity contact) {
+    }
 
     // Pointcut for deleteContact
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.deleteContact(..)) && args(id)")
-    public void deleteContactPointcut(Long id) {}
+    public void deleteContactPointcut(Long id) {
+    }
 
     // Before advice for createContact
     @Before("createContactPointcut(contact)")
@@ -95,14 +98,11 @@ public class ContactChangeTracker {
 
     // Deep copy method for ContactEntity to prevent modifications
     private ContactEntity deepCopy(ContactEntity original) {
-        // Create a new ContactEntity and copy values
-        ContactEntity copy = new ContactEntity();
-        copy.setId(original.getId());
-        copy.setEmail(original.getEmail());
-        copy.setName(original.getName());
-        copy.setMobileNo(original.getMobileNo());
-        // Add other fields here if needed
-
-        return copy;
+        return ContactEntity.builder()
+                .id(original.getId())
+                .email(original.getEmail())
+                .name(original.getName())
+                .mobileNo(original.getMobileNo())
+                .build();
     }
 }
