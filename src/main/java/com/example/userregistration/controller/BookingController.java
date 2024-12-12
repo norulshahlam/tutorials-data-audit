@@ -97,7 +97,7 @@ public class BookingController {
     @ApiResponse(responseCode = "200", description = "contact created",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Create new contact", parameters = {
-            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "username=shah")
+            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "shah")
     }, description = "This endpoint will Create new contact based on the given input data")
     @PostMapping("createContact")
     public ResponseEntity<ContactEntity> createContact(@Valid @RequestBody @NotBlank ContactEntity request) {
