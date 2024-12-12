@@ -11,6 +11,8 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -38,37 +40,39 @@ public class ContactChangeTracker {
         this.auditMappedRepository = auditMappedRepository;
     }
 
-    // Pointcut for createContact
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.createContact(..)) && args(contact)")
     public void createContactPointcut(ContactEntity contact) {
     }
 
-    // Pointcut for editContact
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.editContact(..)) && args(contact)")
     public void editContactPointcut(ContactEntity contact) {
     }
 
-    // Pointcut for deleteContact
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.deleteContact(..)) && args(id)")
     public void deleteContactPointcut(Long id) {
     }
 
-    // Before advice for createContact
     @Before("createContactPointcut(contact)")
     public void trackCreateContactBefore(ContactEntity contact) {
         log.info("[BEFORE CREATE] Attempting to create ContactEntity: {}", contact);
+
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        requestThreadLocal.set(attributes.getRequest());
     }
 
-    // After advice for createContact
     @After("createContactPointcut(contact)")
     public void trackCreateContactAfter(ContactEntity contact) {
         logChangeAsync(contact, null, "CREATE", null, null);
+        requestThreadLocal.remove();
     }
 
-    // Before advice for editContact
     @Before("editContactPointcut(contact)")
     public void trackEditContactBefore(ContactEntity contact) {
-        log.info("[BEFORE UPDATE] Capturing previous state for ContactEntity with ID: {}", contact.getEmail());
+        log.info("[BEFORE UPDATE] Capturing previous state for ContactEntity with ID: {}", contact
+                .getEmail());
+
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        requestThreadLocal.set(attributes.getRequest());
 
         if (contact.getId() != null) {
             Optional<ContactEntity> byId = contactRepository.findById(contact.getId());
@@ -81,7 +85,6 @@ public class ContactChangeTracker {
         }
     }
 
-    // After advice for editContact
     @After("editContactPointcut(contact)")
     public void trackEditContactAfter(ContactEntity contact) {
         Optional<ContactEntity> previousStateOpt = previousStateHolder.get();
@@ -98,6 +101,7 @@ public class ContactChangeTracker {
                 logChangeAsync(contact, "mobileNo", "UPDATE", previousState.getMobileNo(), contact.getMobileNo());
             }
         }
+        requestThreadLocal.remove();
 
         // Clear ThreadLocal after use
         previousStateHolder.remove();
@@ -118,29 +122,31 @@ public class ContactChangeTracker {
                 .commitId(BigDecimal.valueOf(System.currentTimeMillis()))
                 .commitDate(LocalDateTime.now())
                 .version(1L) // You can generate version dynamically or use a field from the entity
-                .author("system") // Replace with the actual author from cookie or session
+                .author(getUsernameFromCookie()) // Replace with the actual author from cookie or session
                 .type(type)
                 .fieldName(fieldName)
                 .oldValue(oldValue)
                 .newValue(newValue)
                 .entity(contact.getClass().getSimpleName())
                 .build();
-
         auditMappedRepository.save(auditBuilder);
     }
 
-    // Before advice for deleteContact
+
     @Before("deleteContactPointcut(id)")
     public void trackDeleteContactBefore(Long id) {
         log.info("[BEFORE DELETE] Deleting ContactEntity with ID: {}", id);
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        requestThreadLocal.set(attributes.getRequest());
+
     }
 
-    // After advice for deleteContact
     @After("deleteContactPointcut(id)")
     public void trackDeleteContactAfter(Long id) {
         ContactEntity contact = new ContactEntity();
         contact.setId(id);
         logChangeAsync(contact, null, "DELETE", null, null);
+        requestThreadLocal.remove();
     }
 
     // Deep copy method for ContactEntity to prevent modifications
@@ -165,6 +171,6 @@ public class ContactChangeTracker {
                 }
             }
         }
-        return null;
+        return "SYSTEM_USERNAME";
     }
 }
