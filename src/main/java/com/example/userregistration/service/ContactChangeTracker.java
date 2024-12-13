@@ -72,16 +72,10 @@ public class ContactChangeTracker {
         requestThreadLocal.set(attributes.getRequest());
 
         ContactEntity previousState = new ContactEntity();
-        if (contact.getId() != null) {
-            Optional<ContactEntity> byId = contactRepository.findById(contact.getId());
-            if (byId.isPresent()) {
-                // Deep copy
-                previousState = deepCopy(byId.get());
-            }
-        }
+        Optional<ContactEntity> byId = contactRepository.findById(contact.getId());
+        byId.ifPresent(i -> deepCopy(byId.get()));
 
         ContactEntity newContact = (ContactEntity) joinPoint.proceed();
-
 
         // Check and log changes for email
         if (!Objects.equals(previousState.getEmail(), newContact.getEmail())) {
@@ -92,6 +86,7 @@ public class ContactChangeTracker {
         if (!Objects.equals(previousState.getMobileNo(), newContact.getMobileNo())) {
             logChangeAsync(newContact, "mobileNo", "UPDATE", previousState.getMobileNo(), newContact.getMobileNo());
         }
+        requestThreadLocal.remove();
     }
 
     @Async
