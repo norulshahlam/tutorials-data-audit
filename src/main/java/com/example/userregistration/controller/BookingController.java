@@ -121,7 +121,9 @@ public class BookingController {
 
     @ApiResponse(responseCode = "200", description = "Contact Edited",
             content = @Content(mediaType = "application/json"))
-    @Operation(summary = "Edit existing contact",
+    @Operation(summary = "Edit existing contact",parameters = {
+            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "shah")
+    },
             description = "This endpoint will Edit existing contact")
     @PostMapping("editContact")
     public ResponseEntity<ContactEntity> editContact(@Valid @RequestBody @NotBlank ContactEntity request) {
