@@ -71,20 +71,23 @@ public class ContactChangeTracker {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         requestThreadLocal.set(attributes.getRequest());
 
-        ContactEntity previousContact = new ContactEntity();
+        ContactEntity previousState = new ContactEntity();
         Optional<ContactEntity> byId = contactRepository.findById(contact.getId());
-        byId.ifPresent(this::deepCopy);
+        if (byId.isPresent()) {
+            // Deep copy
+            previousState = deepCopy(byId.get());
+        }
 
         ContactEntity newContact = (ContactEntity) joinPoint.proceed();
 
         // Check and log changes for email
-        if (!Objects.equals(previousContact.getEmail(), newContact.getEmail())) {
-            logChangeAsync(newContact, "email", "UPDATE", previousContact.getEmail(), newContact.getEmail());
+        if (!Objects.equals(previousState.getEmail(), newContact.getEmail())) {
+            logChangeAsync(newContact, "email", "UPDATE", previousState.getEmail(), newContact.getEmail());
         }
 
         // Check and log changes for mobileNo
-        if (!Objects.equals(previousContact.getMobileNo(), newContact.getMobileNo())) {
-            logChangeAsync(newContact, "mobileNo", "UPDATE", previousContact.getMobileNo(), newContact.getMobileNo());
+        if (!Objects.equals(previousState.getMobileNo(), newContact.getMobileNo())) {
+            logChangeAsync(newContact, "mobileNo", "UPDATE", previousState.getMobileNo(), newContact.getMobileNo());
         }
         requestThreadLocal.remove();
     }
