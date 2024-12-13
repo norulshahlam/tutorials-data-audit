@@ -6,6 +6,9 @@ import com.example.userregistration.repository.AuditMappedRepository;
 import com.example.userregistration.repository.ContactRepository;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.builder.DiffResult;
+import org.apache.commons.lang3.builder.ReflectionDiffBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.scheduling.annotation.Async;
@@ -17,7 +20,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -78,17 +81,23 @@ public class ContactChangeTracker {
             previousState = deepCopy(byId.get());
         }
 
-        ContactEntity newContact = (ContactEntity) joinPoint.proceed();
+        ContactEntity updatedContact = (ContactEntity) joinPoint.proceed();
 
-        // Check and log changes for email
-        if (!Objects.equals(previousState.getEmail(), newContact.getEmail())) {
-            logChangeAsync(newContact, "email", "UPDATE", previousState.getEmail(), newContact.getEmail());
-        }
+        /* Use Apache DiffBuilder to dynamically compare differences */
+        DiffResult<ContactEntity> diffResult = new ReflectionDiffBuilder<>(updatedContact, previousState, ToStringStyle.DEFAULT_STYLE).build();
 
-        // Check and log changes for mobileNo
-        if (!Objects.equals(previousState.getMobileNo(), newContact.getMobileNo())) {
-            logChangeAsync(newContact, "mobileNo", "UPDATE", previousState.getMobileNo(), newContact.getMobileNo());
-        }
+        List<AuditMappedEntity> update = diffResult.getDiffs().stream().map(i -> AuditMappedEntity.builder()
+                .commitDate(LocalDateTime.now())
+                .version(1L)
+                .author(getUsernameFromCookie())
+                .type("UPDATE")
+                .fieldName(i.getFieldName())
+                .oldValue(i.getRight().toString())
+                .newValue(i.getRight().toString())
+                .entity(updatedContact.getClass().getSimpleName())
+                .build()).toList();
+        auditMappedRepository.saveAll(update);
+
         requestThreadLocal.remove();
     }
 
