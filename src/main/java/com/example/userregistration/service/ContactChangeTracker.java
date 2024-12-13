@@ -40,16 +40,13 @@ public class ContactChangeTracker {
     }
 
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.createContact(..)) && args(contact)")
-    public void createContactPointcut(ContactEntity contact) {
-    }
+    public void createContactPointcut(ContactEntity contact) {}
 
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.editContact(..)) && args(contact)")
-    public void editContactPointcut(ContactEntity contact) {
-    }
+    public void editContactPointcut(ContactEntity contact) {}
 
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.deleteContact(..)) && args(id)")
-    public void deleteContactPointcut(Long id) {
-    }
+    public void deleteContactPointcut(Long id) {}
 
     @SneakyThrows
     @Around("createContactPointcut(contact)")
@@ -126,17 +123,15 @@ public class ContactChangeTracker {
         auditMappedRepository.save(auditBuilder);
     }
 
-
-    @Before("deleteContactPointcut(id)")
-    public void trackDeleteContactBefore(Long id) {
+    @SneakyThrows
+    @Around("deleteContactPointcut(id)")
+    public void trackDeleteContactBefore(ProceedingJoinPoint joinPoint, Long id) {
         log.info("[BEFORE DELETE] Deleting ContactEntity with ID: {}", id);
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         requestThreadLocal.set(attributes.getRequest());
 
-    }
+        joinPoint.proceed();
 
-    @After("deleteContactPointcut(id)")
-    public void trackDeleteContactAfter(Long id) {
         ContactEntity contact = new ContactEntity();
         contact.setId(id);
         logChangeAsync(contact, null, "DELETE", null, null);
