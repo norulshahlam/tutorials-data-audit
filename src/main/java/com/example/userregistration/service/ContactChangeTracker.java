@@ -4,11 +4,10 @@ import com.example.userregistration.entity.AuditMappedEntity;
 import com.example.userregistration.entity.ContactEntity;
 import com.example.userregistration.repository.AuditMappedRepository;
 import com.example.userregistration.repository.ContactRepository;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -52,18 +51,15 @@ public class ContactChangeTracker {
     public void deleteContactPointcut(Long id) {
     }
 
-    @Before("createContactPointcut(contact)")
-    public void trackCreateContactBefore(ContactEntity contact) {
-        log.info("[BEFORE CREATE] Attempting to create ContactEntity: {}", contact);
+    @SneakyThrows
+    @Around("createContactPointcut(contact)")
+    public void trackCreateContactBefore(ProceedingJoinPoint joinPoint, ContactEntity contact) {
+        log.info("[BEFORE CREATE] ContactEntity: {}", contact);
 
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        requestThreadLocal.set(attributes.getRequest());
-    }
+        ContactEntity newContact = (ContactEntity) joinPoint.proceed();
 
-    @After("createContactPointcut(contact)")
-    public void trackCreateContactAfter(ContactEntity contact) {
-        logChangeAsync(contact, null, "CREATE", null, null);
-        requestThreadLocal.remove();
+        log.info("[AFTER CREATE] ContactEntity: {}", newContact);
+        logChangeAsync(newContact, null, "CREATE", null, null);
     }
 
     @Before("editContactPointcut(contact)")
