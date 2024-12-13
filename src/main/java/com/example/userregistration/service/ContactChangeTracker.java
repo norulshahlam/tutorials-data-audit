@@ -29,13 +29,10 @@ import java.util.concurrent.Executors;
 @Component
 @Aspect
 public class ContactChangeTracker {
-
     private final ContactRepository contactRepository;
     private final AuditMappedRepository auditMappedRepository;
     private final ExecutorService auditExecutor = Executors.newFixedThreadPool(10);
-    private static final ThreadLocal<Optional<ContactEntity>> previousStateHolder = ThreadLocal.withInitial(Optional::empty);
     private static final ThreadLocal<HttpServletRequest> requestThreadLocal = new ThreadLocal<>();
-
 
     public ContactChangeTracker(ContactRepository contactRepository, AuditMappedRepository auditMappedRepository) {
         this.contactRepository = contactRepository;
@@ -43,16 +40,13 @@ public class ContactChangeTracker {
     }
 
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.createContact(..)) && args(contact)")
-    public void createContactPointcut(ContactEntity contact) {
-    }
+    public void createContactPointcut(ContactEntity contact) {}
 
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.editContact(..)) && args(contact)")
-    public void editContactPointcut(ContactEntity contact) {
-    }
+    public void editContactPointcut(ContactEntity contact) {}
 
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.deleteContact(..)) && args(id)")
-    public void deleteContactPointcut(Long id) {
-    }
+    public void deleteContactPointcut(Long id) {}
 
     @SneakyThrows
     @Around("createContactPointcut(contact)")
@@ -65,10 +59,10 @@ public class ContactChangeTracker {
         logChangeAsync(newContact, null, "CREATE", null, null);
     }
 
+    @SneakyThrows
     @Around("editContactPointcut(contact)")
-    public void trackEditContactBefore(ProceedingJoinPoint joinPoint, ContactEntity contact) throws Throwable {
-        log.info("[BEFORE UPDATE] Capturing previous state for ContactEntity with ID: {}", contact
-                .getEmail());
+    public void trackEditContactBefore(ProceedingJoinPoint joinPoint, ContactEntity contact) {
+        log.info("[BEFORE UPDATE]");
 
         /* Get cookie */
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
