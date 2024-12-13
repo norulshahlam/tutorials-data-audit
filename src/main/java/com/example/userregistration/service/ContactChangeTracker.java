@@ -40,13 +40,16 @@ public class ContactChangeTracker {
     }
 
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.createContact(..)) && args(contact)")
-    public void createContactPointcut(ContactEntity contact) {}
+    public void createContactPointcut(ContactEntity contact) {
+    }
 
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.editContact(..)) && args(contact)")
-    public void editContactPointcut(ContactEntity contact) {}
+    public void editContactPointcut(ContactEntity contact) {
+    }
 
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.deleteContact(..)) && args(id)")
-    public void deleteContactPointcut(Long id) {}
+    public void deleteContactPointcut(Long id) {
+    }
 
     @SneakyThrows
     @Around("createContactPointcut(contact)")
@@ -80,17 +83,19 @@ public class ContactChangeTracker {
         /* Use Apache DiffBuilder to dynamically compare differences */
         DiffResult<ContactEntity> diffResult = new ReflectionDiffBuilder<>(updatedContact, previousState, ToStringStyle.DEFAULT_STYLE).build();
 
-        List<AuditMappedEntity> update = diffResult.getDiffs().stream().map(i -> AuditMappedEntity.builder()
-                .commitDate(LocalDateTime.now())
-                .version(1L)
-                .id(Math.toIntExact(updatedContact.getId()))
-                .author(getUsernameFromCookie())
-                .type("UPDATE")
-                .fieldName(i.getFieldName())
-                .newValue(i.getLeft().toString())
-                .oldValue(i.getRight().toString())
-                .entity(updatedContact.getClass().getSimpleName())
-                .build()).toList();
+        List<AuditMappedEntity> update = diffResult.getDiffs()
+                .stream()
+                .map(i -> AuditMappedEntity.builder()
+                        .commitDate(LocalDateTime.now())
+                        .version(1L)
+                        .id(Math.toIntExact(updatedContact.getId()))
+                        .author(getUsernameFromCookie())
+                        .type("UPDATE")
+                        .fieldName(i.getFieldName())
+                        .newValue(i.getLeft().toString())
+                        .oldValue(i.getRight().toString())
+                        .entity(updatedContact.getClass().getSimpleName())
+                        .build()).toList();
         auditMappedRepository.saveAll(update);
 
         requestThreadLocal.remove();
