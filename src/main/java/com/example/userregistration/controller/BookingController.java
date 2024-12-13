@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 
 @RestController
@@ -93,7 +94,7 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.deleteBooking(id));
     }
 
-
+    @Tag(name = "contacts")
     @ApiResponse(responseCode = "200", description = "contact created",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Create new contact", parameters = {
@@ -107,6 +108,7 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(booking);
     }
 
+    @Tag(name = "contacts")
     @ApiResponse(responseCode = "200", description = "Contact fetched",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Fetch Contact",
@@ -119,6 +121,7 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.OK).body(booking);
     }
 
+    @Tag(name = "contacts")
     @ApiResponse(responseCode = "200", description = "Contact Edited",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Edit existing contact",parameters = {
@@ -132,6 +135,7 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(contactService.editContact(request));
     }
 
+    @Tag(name = "contacts")
     @ApiResponse(responseCode = "200", description = "Contact deleted",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Delete existing Contact",
@@ -141,5 +145,19 @@ public class BookingController {
         log.info("in BookingController::deleteContact");
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(contactService.deleteContact(id));
+    }
+
+    @Tag(name = "contacts")
+    @ApiResponse(responseCode = "200", description = "contact created",
+            content = @Content(mediaType = "application/json"))
+    @Operation(summary = "Create list of contacts", parameters = {
+            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "shah")
+    }, description = "This endpoint will Create list of contacts based on the given input data")
+    @PostMapping("saveMultipleContacts")
+    public ResponseEntity<List<ContactEntity>> saveMultipleContacts(@Valid @RequestBody @NotBlank List<ContactEntity> request) {
+
+        log.info("in BookingController::saveMultipleContacts");
+        List<ContactEntity> contactEntityList = contactService.saveMultipleContacts(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(contactEntityList);
     }
 }
