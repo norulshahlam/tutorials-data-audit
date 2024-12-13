@@ -89,11 +89,12 @@ public class ContactChangeTracker {
         List<AuditMappedEntity> update = diffResult.getDiffs().stream().map(i -> AuditMappedEntity.builder()
                 .commitDate(LocalDateTime.now())
                 .version(1L)
+                .id(Math.toIntExact(updatedContact.getId()))
                 .author(getUsernameFromCookie())
                 .type("UPDATE")
                 .fieldName(i.getFieldName())
+                .newValue(i.getLeft().toString())
                 .oldValue(i.getRight().toString())
-                .newValue(i.getRight().toString())
                 .entity(updatedContact.getClass().getSimpleName())
                 .build()).toList();
         auditMappedRepository.saveAll(update);
@@ -115,8 +116,8 @@ public class ContactChangeTracker {
                 .id(contact.getId() != null ? Math.toIntExact(contact.getId()) : null)
                 .commitId(BigDecimal.valueOf(System.currentTimeMillis()))
                 .commitDate(LocalDateTime.now())
-                .version(1L) // You can generate version dynamically or use a field from the entity
-                .author(getUsernameFromCookie()) // Replace with the actual author from cookie or session
+                .version(1L)
+                .author(getUsernameFromCookie())
                 .type(type)
                 .fieldName(fieldName)
                 .oldValue(oldValue)
