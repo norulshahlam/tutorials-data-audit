@@ -62,45 +62,36 @@ public class ContactChangeTracker {
         logChangeAsync(newContact, null, "CREATE", null, null);
     }
 
-    @Before("editContactPointcut(contact)")
-    public void trackEditContactBefore(ContactEntity contact) {
+    @Around("editContactPointcut(contact)")
+    public void trackEditContactBefore(ProceedingJoinPoint joinPoint, ContactEntity contact) throws Throwable {
         log.info("[BEFORE UPDATE] Capturing previous state for ContactEntity with ID: {}", contact
                 .getEmail());
 
+        /* Get cookie */
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         requestThreadLocal.set(attributes.getRequest());
 
+        ContactEntity previousState = new ContactEntity();
         if (contact.getId() != null) {
             Optional<ContactEntity> byId = contactRepository.findById(contact.getId());
-
             if (byId.isPresent()) {
-                // Deep copy before setting in ThreadLocal
-                ContactEntity previousState = deepCopy(byId.get());
-                previousStateHolder.set(Optional.of(previousState)); // Capture the state before edit
+                // Deep copy
+                previousState = deepCopy(byId.get());
             }
         }
-    }
 
-    @After("editContactPointcut(contact)")
-    public void trackEditContactAfter(ContactEntity contact) {
-        Optional<ContactEntity> previousStateOpt = previousStateHolder.get();
-        if (previousStateOpt.isPresent()) {
-            ContactEntity previousState = previousStateOpt.get();
+        ContactEntity newContact = (ContactEntity) joinPoint.proceed();
 
-            // Check and log changes for email
-            if (!Objects.equals(previousState.getEmail(), contact.getEmail())) {
-                logChangeAsync(contact, "email", "UPDATE", previousState.getEmail(), contact.getEmail());
-            }
 
-            // Check and log changes for mobileNo
-            if (!Objects.equals(previousState.getMobileNo(), contact.getMobileNo())) {
-                logChangeAsync(contact, "mobileNo", "UPDATE", previousState.getMobileNo(), contact.getMobileNo());
-            }
+        // Check and log changes for email
+        if (!Objects.equals(previousState.getEmail(), newContact.getEmail())) {
+            logChangeAsync(newContact, "email", "UPDATE", previousState.getEmail(), newContact.getEmail());
         }
-        requestThreadLocal.remove();
 
-        // Clear ThreadLocal after use
-        previousStateHolder.remove();
+        // Check and log changes for mobileNo
+        if (!Objects.equals(previousState.getMobileNo(), newContact.getMobileNo())) {
+            logChangeAsync(newContact, "mobileNo", "UPDATE", previousState.getMobileNo(), newContact.getMobileNo());
+        }
     }
 
     @Async
