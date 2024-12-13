@@ -40,33 +40,66 @@ public class ContactChangeTracker {
     }
 
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.createContact(..)) && args(contact)")
-    public void createContactPointcut(ContactEntity contact) {}
+    public void createContactPointcut(ContactEntity contact) {
+    }
 
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.editContact(..)) && args(contact)")
-    public void editContactPointcut(ContactEntity contact) {}
+    public void editContactPointcut(ContactEntity contact) {
+    }
 
     @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.deleteContact(..)) && args(id)")
-    public void deleteContactPointcut(Long id) {}
+    public void deleteContactPointcut(Long id) {
+    }
+
+    @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.saveMultipleContacts(..)) && args(contactEntities)")
+    public void saveMultipleContactsPointcut(List<ContactEntity> contactEntities) {
+    }
+
+    @Around("saveMultipleContactsPointcut(contactEntities)")
+    public void trackSaveMultipleContacts(ProceedingJoinPoint joinPoint, List<ContactEntity> contactEntities) throws Throwable {
+        log.info("[BEFORE BULK CREATE] Attempting to create multiple contacts: {}", contactEntities);
+
+        /* Get cookie */
+        getServletAttributes();
+
+        List<ContactEntity> createdContactLists = (List<ContactEntity>) joinPoint.proceed();
+
+        List<AuditMappedEntity> mappedContactLists = createdContactLists.stream()
+                .map(i -> AuditMappedEntity.builder()
+                        .commitDate(LocalDateTime.now())
+                        .version(1L)
+                        .id(Math.toIntExact(i.getId()))
+                        .author(getUsernameFromCookie())
+                        .type("CREATE")
+                        .entity(i.getClass().getSimpleName())
+                        .build()).toList();
+        auditMappedRepository.saveAll(mappedContactLists);
+
+        requestThreadLocal.remove();
+    }
 
     @SneakyThrows
     @Around("createContactPointcut(contact)")
-    public void trackCreateContactBefore(ProceedingJoinPoint joinPoint, ContactEntity contact) {
+    public void trackCreateContactAround(ProceedingJoinPoint joinPoint, ContactEntity contact) {
         log.info("[BEFORE CREATE] ContactEntity: {}", contact);
+
+        /* Get cookie */
+        getServletAttributes();
 
         ContactEntity newContact = (ContactEntity) joinPoint.proceed();
 
         log.info("[AFTER CREATE] ContactEntity: {}", newContact);
         logChangeAsync(newContact, null, "CREATE", null, null);
+        requestThreadLocal.remove();
     }
 
     @SneakyThrows
     @Around("editContactPointcut(contact)")
-    public void trackEditContactBefore(ProceedingJoinPoint joinPoint, ContactEntity contact) {
+    public void trackEditContactAround(ProceedingJoinPoint joinPoint, ContactEntity contact) {
         log.info("[BEFORE UPDATE]");
 
         /* Get cookie */
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        requestThreadLocal.set(attributes.getRequest());
+        getServletAttributes();
 
         ContactEntity previousState = new ContactEntity();
         Optional<ContactEntity> byId = contactRepository.findById(contact.getId());
@@ -98,12 +131,29 @@ public class ContactChangeTracker {
         requestThreadLocal.remove();
     }
 
+
+    @SneakyThrows
+    @Around("deleteContactPointcut(id)")
+    public void trackDeleteContactAround(ProceedingJoinPoint joinPoint, Long id) {
+        log.info("[BEFORE DELETE] Deleting ContactEntity with ID: {}", id);
+        getServletAttributes();
+
+        joinPoint.proceed();
+
+        ContactEntity contact = new ContactEntity();
+        contact.setId(id);
+        logChangeAsync(contact, null, "DELETE", null, null);
+        requestThreadLocal.remove();
+    }
+
     @Async
     public void logChangeAsync(ContactEntity contact, String fieldName, String type, String oldValue, String newValue) {
         auditExecutor.submit(() -> logChange(contact, fieldName, type, oldValue, newValue));
     }
 
     private void logChange(ContactEntity contact, String fieldName, String type, String oldValue, String newValue) {
+
+        getServletAttributes();
 
         log.info("[{}] ID: {}, Time: {}, Field: {}, Old Value: {}, New Value: {}",
                 type, contact.getId(), LocalDateTime.now(), fieldName, oldValue, newValue);
@@ -121,21 +171,12 @@ public class ContactChangeTracker {
                 .entity(contact.getClass().getSimpleName())
                 .build();
         auditMappedRepository.save(auditBuilder);
+        requestThreadLocal.remove();
     }
 
-    @SneakyThrows
-    @Around("deleteContactPointcut(id)")
-    public void trackDeleteContactBefore(ProceedingJoinPoint joinPoint, Long id) {
-        log.info("[BEFORE DELETE] Deleting ContactEntity with ID: {}", id);
+    private static void getServletAttributes() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         requestThreadLocal.set(attributes.getRequest());
-
-        joinPoint.proceed();
-
-        ContactEntity contact = new ContactEntity();
-        contact.setId(id);
-        logChangeAsync(contact, null, "DELETE", null, null);
-        requestThreadLocal.remove();
     }
 
     // Deep copy method for ContactEntity to prevent modifications
