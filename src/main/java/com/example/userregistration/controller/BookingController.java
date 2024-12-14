@@ -124,7 +124,7 @@ public class BookingController {
     @Tag(name = "contacts")
     @ApiResponse(responseCode = "200", description = "Contact Edited",
             content = @Content(mediaType = "application/json"))
-    @Operation(summary = "Edit existing contact",parameters = {
+    @Operation(summary = "Edit existing contact", parameters = {
             @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "shah")
     },
             description = "This endpoint will Edit existing contact")
