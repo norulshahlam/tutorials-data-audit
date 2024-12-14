@@ -57,7 +57,7 @@ public class ContactChangeTracker {
     @SneakyThrows
     @Around("saveMultipleContactsPointcut(contactEntities)")
     public void trackSaveMultipleContacts(ProceedingJoinPoint joinPoint, List<ContactEntity> contactEntities) {
-        log.info("[BEFORE BULK CREATE] Attempting to create multiple contacts: {}", contactEntities);
+        log.info("[BEFORE BULK CREATE] Attempting to create multiple contacts");
 
         /* Get cookie */
         getServletAttributes();
@@ -74,6 +74,7 @@ public class ContactChangeTracker {
                         .entity(i.getClass().getSimpleName())
                         .build()).toList();
         auditMappedRepository.saveAll(mappedContactLists);
+        log.info("[AFTER BULK CREATE] Attempting to create multiple contacts");
 
         requestThreadLocal.remove();
     }
@@ -81,18 +82,18 @@ public class ContactChangeTracker {
     @SneakyThrows
     @Around("createContactPointcut(contact)")
     public void trackCreateContactAround(ProceedingJoinPoint joinPoint, ContactEntity contact) {
-        log.info("[BEFORE CREATE] ContactEntity: {}", contact);
+        log.info("[BEFORE CREATE]");
 
         ContactEntity newContact = (ContactEntity) joinPoint.proceed();
 
-        log.info("[AFTER CREATE] ContactEntity: {}", newContact);
         logChange(newContact, null, "CREATE", null, null);
+        log.info("[AFTER CREATE ID: {}]",newContact.getId());
     }
 
     @SneakyThrows
     @Around("editContactPointcut(contact)")
     public void trackEditContactAround(ProceedingJoinPoint joinPoint, ContactEntity contact) {
-        log.info("[BEFORE UPDATE]");
+        log.info("[BEFORE UPDATE] ID: {}", contact.getId());
 
         /* Get cookie */
         getServletAttributes();
@@ -123,20 +124,21 @@ public class ContactChangeTracker {
                         .entity(updatedContact.getClass().getSimpleName())
                         .build()).toList();
         auditMappedRepository.saveAll(update);
-
+        log.info("[AFTER UPDATE] ID: {}", contact.getId());
         requestThreadLocal.remove();
     }
 
     @SneakyThrows
     @Around("deleteContactPointcut(id)")
     public void trackDeleteContactAround(ProceedingJoinPoint joinPoint, Long id) {
-        log.info("[BEFORE DELETE] Deleting ContactEntity with ID: {}", id);
+        log.info("[BEFORE DELETE] ID: {}", id);
 
         joinPoint.proceed();
 
         ContactEntity contact = new ContactEntity();
         contact.setId(id);
         logChange(contact, null, "DELETE", null, null);
+        log.info("[AFTER DELETE] ID: {}", id);
     }
 
 
