@@ -1,8 +1,8 @@
 # Data auditing 
 
-## This is a tutorial for auditing using [Javers](https://javers.org/documentation/jql-examples/). We will be using h2 as the default DB.
+## This is a tutorial for auditing manually using AOP 
 
-There is booking entity that contains contact entity as child entity. Add either one first, then edit or delete using Swagger. Based on your query, if u edit a child entity within parent entity, you can either track child entity or not. Current config will not be track.
+There is booking entity that contains contact entity as child entity. Add either one first, then edit or delete using Swagger. 
 
 ## Swagger url
     http://localhost:8080/swagger-ui/index.html
@@ -14,22 +14,7 @@ There is booking entity that contains contact entity as child entity. Add either
 
     http://localhost:8080/h2-console  
     JDBC URL: jdbc:h2:mem:audittable  
-    SELECT * FROM JV_SNAPSHOT  
-
-### For accessing audit data in DB (default mapping)
-
-    SELECT commit_id,  version, g.local_id as "id",  author, type, state, changed_properties, managed_type, commit_date FROM jv_snapshot INNER JOIN jv_commit ON commit_pk = commit_fk INNER JOIN jv_global_id g ON g.global_id_pk = global_id_fk LEFT OUTER JOIN jv_global_id o ON o.global_id_pk = g.owner_id_fk WHERE 1 = 1 ORDER BY g.local_id
-
-## How to clean up snapshots and commits after a period of time in Javers?
-
-Clean up can be done in the following order:
-
-    DELETE FROM jv_commit_property;
-    DELETE FROM jv_snapshot;
-    DELETE FROM jv_commit;
-    DELETE FROM jv_global_id WHERE owner_id_fk IS NOT NULL;
-    DELETE FROM jv_global_id;
-    Note : You can put the filter clause as per your need which is not considered in the above DB Script.
+    SELECT * FROM AUDIT_MAPPED
 
 ## Use case
 
@@ -43,17 +28,3 @@ There will be preloaded data, so you can access the audit right away
 Run the endpoint `/audit/contactsPretty` first, and it will save for you your custom audit mapping.
 
     SELECT commit, commit_id, version, id, author, type, field_name, old_value, new_value, entity, commit_date FROM AUDIT_MAPPED order by commit_date desc
-
-## Image samples
-
-Default mapping
-
-![Image](src/main/resources/default-mapping.PNG)
-
-Custom mapping
-
-![Image](src/main/resources/custom-mapping.PNG)
-
-Custom mapping to text file
-
-![Image](src/main/resources/custom-mapping-txt.PNG)
