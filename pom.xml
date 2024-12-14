@@ -88,11 +88,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.gavlyukovskiy</groupId>
-            <artifactId>p6spy-spring-boot-starter</artifactId>
-            <version>1.9.0</version>
-        </dependency>
-        <dependency>
             <groupId>de.vandermeer</groupId>
             <artifactId>asciitable</artifactId>
             <version>0.3.2</version>
