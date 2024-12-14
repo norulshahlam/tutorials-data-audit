@@ -56,7 +56,7 @@ public class ContactChangeTracker {
     @SuppressWarnings("unchecked")
     @SneakyThrows
     @Around("saveMultipleContactsPointcut(contactEntities)")
-    public void trackSaveMultipleContacts(ProceedingJoinPoint joinPoint, List<ContactEntity> contactEntities)  {
+    public void trackSaveMultipleContacts(ProceedingJoinPoint joinPoint, List<ContactEntity> contactEntities) {
         log.info("[BEFORE BULK CREATE] Attempting to create multiple contacts: {}", contactEntities);
 
         /* Get cookie */
@@ -83,14 +83,10 @@ public class ContactChangeTracker {
     public void trackCreateContactAround(ProceedingJoinPoint joinPoint, ContactEntity contact) {
         log.info("[BEFORE CREATE] ContactEntity: {}", contact);
 
-        /* Get cookie */
-        getServletAttributes();
-
         ContactEntity newContact = (ContactEntity) joinPoint.proceed();
 
         log.info("[AFTER CREATE] ContactEntity: {}", newContact);
         logChange(newContact, null, "CREATE", null, null);
-        requestThreadLocal.remove();
     }
 
     @SneakyThrows
@@ -135,23 +131,18 @@ public class ContactChangeTracker {
     @Around("deleteContactPointcut(id)")
     public void trackDeleteContactAround(ProceedingJoinPoint joinPoint, Long id) {
         log.info("[BEFORE DELETE] Deleting ContactEntity with ID: {}", id);
-        getServletAttributes();
 
         joinPoint.proceed();
 
         ContactEntity contact = new ContactEntity();
         contact.setId(id);
         logChange(contact, null, "DELETE", null, null);
-        requestThreadLocal.remove();
     }
 
 
     private void logChange(ContactEntity contact, String fieldName, String type, String oldValue, String newValue) {
 
         getServletAttributes();
-
-        log.info("[{}] ID: {}, Time: {}, Field: {}, Old Value: {}, New Value: {}",
-                type, contact.getId(), LocalDateTime.now(), fieldName, oldValue, newValue);
 
         AuditMappedEntity auditBuilder = AuditMappedEntity.builder()
                 .id(contact.getId() != null ? Math.toIntExact(contact.getId()) : null)
