@@ -6,6 +6,8 @@ import com.example.userregistration.service.BookingService;
 import com.example.userregistration.service.ContactService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 
 @RestController
@@ -91,11 +94,12 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.deleteBooking(id));
     }
 
-
+    @Tag(name = "contacts")
     @ApiResponse(responseCode = "200", description = "contact created",
             content = @Content(mediaType = "application/json"))
-    @Operation(summary = "Create new contact",
-            description = "This endpoint will Create new contact based on the given input data")
+    @Operation(summary = "Create new contact", parameters = {
+            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "shah")
+    }, description = "This endpoint will Create new contact based on the given input data")
     @PostMapping("createContact")
     public ResponseEntity<ContactEntity> createContact(@Valid @RequestBody @NotBlank ContactEntity request) {
 
@@ -104,6 +108,7 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(booking);
     }
 
+    @Tag(name = "contacts")
     @ApiResponse(responseCode = "200", description = "Contact fetched",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Fetch Contact",
@@ -116,9 +121,12 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.OK).body(booking);
     }
 
+    @Tag(name = "contacts")
     @ApiResponse(responseCode = "200", description = "Contact Edited",
             content = @Content(mediaType = "application/json"))
-    @Operation(summary = "Edit existing contact",
+    @Operation(summary = "Edit existing contact", parameters = {
+            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "shah")
+    },
             description = "This endpoint will Edit existing contact")
     @PostMapping("editContact")
     public ResponseEntity<ContactEntity> editContact(@Valid @RequestBody @NotBlank ContactEntity request) {
@@ -127,6 +135,7 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(contactService.editContact(request));
     }
 
+    @Tag(name = "contacts")
     @ApiResponse(responseCode = "200", description = "Contact deleted",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Delete existing Contact",
@@ -136,5 +145,19 @@ public class BookingController {
         log.info("in BookingController::deleteContact");
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(contactService.deleteContact(id));
+    }
+
+    @Tag(name = "contacts")
+    @ApiResponse(responseCode = "200", description = "contact created",
+            content = @Content(mediaType = "application/json"))
+    @Operation(summary = "Create list of contacts", parameters = {
+            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "shah")
+    }, description = "This endpoint will Create list of contacts based on the given input data")
+    @PostMapping("saveMultipleContacts")
+    public ResponseEntity<List<ContactEntity>> saveMultipleContacts(@Valid @RequestBody @NotBlank List<ContactEntity> request) {
+
+        log.info("in BookingController::saveMultipleContacts");
+        List<ContactEntity> contactEntityList = contactService.saveMultipleContacts(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(contactEntityList);
     }
 }
