@@ -10,8 +10,9 @@ import org.apache.commons.lang3.builder.DiffResult;
 import org.apache.commons.lang3.builder.ReflectionDiffBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.*;
-import org.springframework.scheduling.annotation.Async;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -31,7 +32,6 @@ import java.util.concurrent.Executors;
 public class ContactChangeTracker {
     private final ContactRepository contactRepository;
     private final AuditMappedRepository auditMappedRepository;
-    private final ExecutorService auditExecutor = Executors.newFixedThreadPool(10);
     private static final ThreadLocal<HttpServletRequest> requestThreadLocal = new ThreadLocal<>();
 
     public ContactChangeTracker(ContactRepository contactRepository, AuditMappedRepository auditMappedRepository) {
@@ -89,7 +89,7 @@ public class ContactChangeTracker {
         ContactEntity newContact = (ContactEntity) joinPoint.proceed();
 
         log.info("[AFTER CREATE] ContactEntity: {}", newContact);
-        logChangeAsync(newContact, null, "CREATE", null, null);
+        logChange(newContact, null, "CREATE", null, null);
         requestThreadLocal.remove();
     }
 
@@ -142,14 +142,10 @@ public class ContactChangeTracker {
 
         ContactEntity contact = new ContactEntity();
         contact.setId(id);
-        logChangeAsync(contact, null, "DELETE", null, null);
+        logChange(contact, null, "DELETE", null, null);
         requestThreadLocal.remove();
     }
 
-    @Async
-    public void logChangeAsync(ContactEntity contact, String fieldName, String type, String oldValue, String newValue) {
-        auditExecutor.submit(() -> logChange(contact, fieldName, type, oldValue, newValue));
-    }
 
     private void logChange(ContactEntity contact, String fieldName, String type, String oldValue, String newValue) {
 
