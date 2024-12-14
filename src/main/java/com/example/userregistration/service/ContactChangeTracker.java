@@ -23,8 +23,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Slf4j
 @Component
@@ -55,8 +53,10 @@ public class ContactChangeTracker {
     public void saveMultipleContactsPointcut(List<ContactEntity> contactEntities) {
     }
 
+    @SuppressWarnings("unchecked")
+    @SneakyThrows
     @Around("saveMultipleContactsPointcut(contactEntities)")
-    public void trackSaveMultipleContacts(ProceedingJoinPoint joinPoint, List<ContactEntity> contactEntities) throws Throwable {
+    public void trackSaveMultipleContacts(ProceedingJoinPoint joinPoint, List<ContactEntity> contactEntities)  {
         log.info("[BEFORE BULK CREATE] Attempting to create multiple contacts: {}", contactEntities);
 
         /* Get cookie */
