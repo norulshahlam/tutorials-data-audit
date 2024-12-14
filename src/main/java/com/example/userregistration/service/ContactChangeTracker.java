@@ -131,7 +131,6 @@ public class ContactChangeTracker {
         requestThreadLocal.remove();
     }
 
-
     @SneakyThrows
     @Around("deleteContactPointcut(id)")
     public void trackDeleteContactAround(ProceedingJoinPoint joinPoint, Long id) {
