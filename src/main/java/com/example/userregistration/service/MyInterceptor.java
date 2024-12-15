@@ -7,8 +7,9 @@ import org.hibernate.Transaction;
 import org.hibernate.type.Type;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Objects;
+import java.util.stream.IntStream;
 
 /**
  * This interceptor is thread safe since it will be constructed per session, not per session factory.
@@ -26,13 +27,18 @@ public class MyInterceptor extends EmptyInterceptor {
     @Override
     public boolean onFlushDirty(Object entity, Serializable id, Object[] currentState, Object[] previousState, String[] propertyNames, Type[] types) {
         log.info("********************AUDIT INFO START*******************");
-        log.info("Entity Name    :: " + entity.getClass());
-        log.info("Previous state :: " + Arrays.deepToString(previousState));
-        log.info("Current  state :: " + Arrays.deepToString(currentState));
-        log.info("propertyNames  :: " + Arrays.deepToString(propertyNames));
+        log.info("Entity Name :: {}", entity.getClass().getSimpleName());
+
+        // Use IntStream to iterate over property indices
+        IntStream.range(0, propertyNames.length)
+                .filter(i -> !Objects.equals(previousState[i], currentState[i])) // Filter only changed properties
+                .forEach(i -> log.info("Property Changed: {} | Old Value: {} | New Value: {}",
+                        propertyNames[i], previousState[i], currentState[i])); // Log details of changed properties
+
         log.info("********************AUDIT INFO END*******************");
         return super.onFlushDirty(entity, id, currentState, previousState, propertyNames, types);
     }
+
 
     @Override
     public void onDelete(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
