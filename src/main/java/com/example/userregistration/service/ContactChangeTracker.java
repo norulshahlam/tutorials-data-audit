@@ -106,6 +106,7 @@ public class ContactChangeTracker {
         }
 
         ContactEntity updatedContact = (ContactEntity) joinPoint.proceed();
+        log.info("[AFTER UPDATE] ID: {}", contact.getId());
 
         /* Use Apache DiffBuilder to dynamically compare differences */
         DiffResult<ContactEntity> diffResult = new ReflectionDiffBuilder<>(updatedContact, previousState, ToStringStyle.DEFAULT_STYLE).build();
@@ -124,7 +125,6 @@ public class ContactChangeTracker {
                         .entity(updatedContact.getClass().getSimpleName())
                         .build()).toList();
         auditMappedRepository.saveAll(update);
-        log.info("[AFTER UPDATE] ID: {}", contact.getId());
         requestThreadLocal.remove();
     }
 
