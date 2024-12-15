@@ -93,7 +93,7 @@ public class Helper {
         } catch (IOException e) {
             throw new RuntimeException("Error writing to file", e);
         }
-        return table.render();
+        return tableString;
     }
 
 
