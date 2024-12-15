@@ -63,6 +63,7 @@ public class ContactChangeTracker {
         getServletAttributes();
 
         List<ContactEntity> createdContactLists = (List<ContactEntity>) joinPoint.proceed();
+        log.info("[AFTER BULK CREATE] Attempting to create multiple contacts");
 
         List<AuditMappedEntity> mappedContactLists = createdContactLists.stream()
                 .map(i -> AuditMappedEntity.builder()
@@ -74,7 +75,6 @@ public class ContactChangeTracker {
                         .entity(i.getClass().getSimpleName())
                         .build()).toList();
         auditMappedRepository.saveAll(mappedContactLists);
-        log.info("[AFTER BULK CREATE] Attempting to create multiple contacts");
 
         requestThreadLocal.remove();
     }
@@ -85,9 +85,9 @@ public class ContactChangeTracker {
         log.info("[BEFORE CREATE]");
 
         ContactEntity newContact = (ContactEntity) joinPoint.proceed();
+        log.info("[AFTER CREATE ID: {}]",newContact.getId());
 
         logChange(newContact, null, "CREATE", null, null);
-        log.info("[AFTER CREATE ID: {}]",newContact.getId());
     }
 
     @SneakyThrows
@@ -134,11 +134,11 @@ public class ContactChangeTracker {
         log.info("[BEFORE DELETE] ID: {}", id);
 
         joinPoint.proceed();
+        log.info("[AFTER DELETE] ID: {}", id);
 
         ContactEntity contact = new ContactEntity();
         contact.setId(id);
         logChange(contact, null, "DELETE", null, null);
-        log.info("[AFTER DELETE] ID: {}", id);
     }
 
 
