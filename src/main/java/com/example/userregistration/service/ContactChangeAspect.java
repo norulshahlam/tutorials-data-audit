@@ -27,12 +27,12 @@ import java.util.Optional;
 @Slf4j
 @Component
 @Aspect
-public class ContactChangeTracker {
+public class ContactChangeAspect {
     private final ContactRepository contactRepository;
     private final AuditMappedRepository auditMappedRepository;
     private static final ThreadLocal<HttpServletRequest> requestThreadLocal = new ThreadLocal<>();
 
-    public ContactChangeTracker(ContactRepository contactRepository, AuditMappedRepository auditMappedRepository) {
+    public ContactChangeAspect(ContactRepository contactRepository, AuditMappedRepository auditMappedRepository) {
         this.contactRepository = contactRepository;
         this.auditMappedRepository = auditMappedRepository;
     }
