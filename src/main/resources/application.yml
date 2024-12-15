@@ -48,7 +48,7 @@ spring:
     maxLifetime: 1800000
     connectionTimeout: 300000
     leakDetectionThreshold: 300000
-#logging:
-#  level:
-#    org.hibernate: DEBUG
-#    event.internal: DEBUG
+logging:
+  level:
+    org.hibernate: DEBUG
+    event.internal: DEBUG
