@@ -5,11 +5,18 @@ import com.example.userregistration.repository.AuditMappedRepository;
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestWord;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -22,6 +29,29 @@ public class Helper {
 
     private final AuditMappedRepository auditMappedRepository;
 
+    public ResponseEntity<InputStreamResource> generateAuditReport(List<AuditMappedEntity> records) {
+        if (records == null || records.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        // Create an ASCII table and export the data
+        String tableString = exportAsText(records);
+
+        // Convert the content to an InputStream (can be a ByteArrayInputStream)
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(tableString.getBytes(StandardCharsets.UTF_8));
+
+        // Create a resource from the byte array
+        InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
+
+        // Set the headers and return the file as a response
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=audit_report.txt");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(resource);
+    }
 
     public String exportAsText(List<AuditMappedEntity> records) {
         // Create an ASCII table
@@ -63,7 +93,7 @@ public class Helper {
         } catch (IOException e) {
             throw new RuntimeException("Error writing to file", e);
         }
-        return tableString;
+        return table.render();
     }
 
 
