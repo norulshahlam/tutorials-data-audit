@@ -1,6 +1,5 @@
 package com.example.userregistration.entity;
 
-import com.example.userregistration.listener.ContactAuditListener;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

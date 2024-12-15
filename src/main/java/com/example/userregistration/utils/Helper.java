@@ -1,9 +1,11 @@
 package com.example.userregistration.utils;
 
 import com.example.userregistration.entity.AuditMappedEntity;
+import com.example.userregistration.repository.AuditMappedRepository;
 import de.vandermeer.asciitable.AsciiTable;
 import de.vandermeer.asciitable.CWC_LongestWord;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -11,7 +13,15 @@ import java.io.IOException;
 import java.util.List;
 
 @Slf4j
+@Service
 public class Helper {
+
+    public Helper(AuditMappedRepository auditMappedRepository) {
+        this.auditMappedRepository = auditMappedRepository;
+    }
+
+    private final AuditMappedRepository auditMappedRepository;
+
 
     public void exportAsText(List<AuditMappedEntity> records) {
         // Create an ASCII table

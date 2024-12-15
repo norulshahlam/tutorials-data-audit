@@ -32,5 +32,4 @@ public class AuditMappedEntity {
     private String oldValue;
     private String newValue;
     private String entity;
-
 }
