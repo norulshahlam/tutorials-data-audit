@@ -1,8 +1,6 @@
 # Data auditing 
 
-## This is a tutorial for auditing manually using AOP 
-
-There is booking entity that contains contact entity as child entity. Add either one first, then edit or delete using Swagger. 
+## This is a tutorial for auditing manually using AOP
 
 ## Swagger url
     http://localhost:8080/swagger-ui/index.html
@@ -18,13 +16,4 @@ There is booking entity that contains contact entity as child entity. Add either
 
 ## Use case
 
-There will be preloaded data, so you can access the audit right away
-
-    add 2 new records
-    edit both records
-    delete both records
-
-## NEW - added table for custom audit mapping
-Run the endpoint `/audit/contactsPretty` first, and it will save for you your custom audit mapping.
-
-    SELECT commit, commit_id, version, id, author, type, field_name, old_value, new_value, entity, commit_date FROM AUDIT_MAPPED order by commit_date desc
+Add contact entity as single or a list in Swagger UI. Then edit or delete them. it will be reflected in the Audit table via h2 console
