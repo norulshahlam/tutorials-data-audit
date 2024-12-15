@@ -17,7 +17,6 @@ import java.util.List;
  */
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@EnableAspectJAutoProxy
 @Slf4j
 public class TutorialsDataAuditApplication implements CommandLineRunner {
 
