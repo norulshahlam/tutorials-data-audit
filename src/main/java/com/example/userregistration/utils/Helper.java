@@ -23,7 +23,7 @@ public class Helper {
     private final AuditMappedRepository auditMappedRepository;
 
 
-    public void exportAsText(List<AuditMappedEntity> records) {
+    public String exportAsText(List<AuditMappedEntity> records) {
         // Create an ASCII table
         AsciiTable table = new AsciiTable();
         table.getRenderer().setCWC(new CWC_LongestWord());
@@ -55,6 +55,7 @@ public class Helper {
         String tableString = table.render();
 
         // Write the table to a text file
+        log.info("Saving to text file");
         String path = "C:/Users/NORUL/Documents/GitHub/tutorials-data-audit/src/main/resources/data.txt";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             writer.write(tableString);
@@ -62,7 +63,7 @@ public class Helper {
         } catch (IOException e) {
             throw new RuntimeException("Error writing to file", e);
         }
-        log.info("Saving to text file");
+        return tableString;
     }
 
 
