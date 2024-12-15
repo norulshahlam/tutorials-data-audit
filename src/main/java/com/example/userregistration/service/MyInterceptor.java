@@ -3,10 +3,11 @@ package com.example.userregistration.service;
 
 import com.example.userregistration.entity.ContactEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.CallbackException;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.type.Type;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Objects;
@@ -17,6 +18,9 @@ import java.util.stream.IntStream;
  */
 @Slf4j
 public class MyInterceptor extends EmptyInterceptor {
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Override
     public boolean onSave(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
@@ -38,7 +42,6 @@ public class MyInterceptor extends EmptyInterceptor {
         return super.onFlushDirty(entity, id, currentState, previousState, propertyNames, types);
     }
 
-
     @Override
     public void onDelete(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
         log.info("onDelete");
@@ -48,12 +51,7 @@ public class MyInterceptor extends EmptyInterceptor {
     @Override
     public void postFlush(final Iterator entities) {
         log.info("postFlush");
+//        entityManager.createQuery(entity)
         super.postFlush(entities);
-    }
-
-    @Override
-    public void onCollectionRemove(Object collection, Serializable key) throws CallbackException {
-        log.info("onCollectionRemove");
-        super.onCollectionRemove(collection, key);
     }
 }
