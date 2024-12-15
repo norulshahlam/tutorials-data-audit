@@ -3,6 +3,7 @@ package com.example.userregistration.controller;
 import com.example.userregistration.entity.AuditMappedEntity;
 import com.example.userregistration.entity.BookingEntity;
 import com.example.userregistration.entity.ContactEntity;
+import com.example.userregistration.repository.AuditMappedRepository;
 import com.example.userregistration.repository.BookingRepository;
 import com.example.userregistration.service.JaversService;
 import com.example.userregistration.utils.Helper;
@@ -25,6 +26,8 @@ import org.javers.core.diff.Change;
 import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.JqlQuery;
 import org.javers.repository.jql.QueryBuilder;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -43,12 +46,14 @@ public class AuditController {
     private final Javers javers;
     private final BookingRepository bookingRepository;
     private final JaversService javersService;
+    private final AuditMappedRepository auditMappedRepository;
 
-    public AuditController(Helper helper, Javers javers, BookingRepository bookingRepository, JaversService javersService) {
+    public AuditController(Helper helper, Javers javers, BookingRepository bookingRepository, JaversService javersService, AuditMappedRepository auditMappedRepository) {
         this.helper = helper;
         this.javers = javers;
         this.bookingRepository = bookingRepository;
         this.javersService = javersService;
+        this.auditMappedRepository = auditMappedRepository;
     }
 
 
@@ -198,18 +203,18 @@ public class AuditController {
     }
 
 
-    @Hidden
-    @GetMapping("/getShadowsWithScopeDeepPlusQuery")
-    public List getShadowsWithScopeDeepPlusQuery(
-            @RequestParam(defaultValue = "1") Long id,
-            @RequestParam(defaultValue = "BookingEntity") String entityClass,
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "5") Integer pageSize,
-            @RequestParam Boolean isNextRecordRequired) throws ClassNotFoundException {
+    @GetMapping("/getAuditReport")
+    @Operation(summary = "Get contact audit report", description = "This endpoint will Get all contact audit")
+    public ResponseEntity<InputStreamResource> getAuditReport() {
+        QueryBuilder jqlQuery = QueryBuilder.byClass(ContactEntity.class);
+        Changes changes = javers.findChanges(jqlQuery.build());
+        List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
 
-        Class<?> className = Class.forName("com.example.userregistration.entity." + entityClass);
-        log.info("className: {}", className.getName());
-        return javersService.getShadowsWithScopeDeepPlusQuery(id, className, page, pageSize, isNextRecordRequired);
+        if (!changes.isEmpty()) {
+            List<AuditMappedEntity> mappedList = helper.customizeAuditDetails(changes, snapshots);
+            return helper.generateAuditReport(mappedList);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Hidden

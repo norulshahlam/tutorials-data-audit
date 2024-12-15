@@ -9,12 +9,19 @@ import org.javers.core.Changes;
 import org.javers.core.commit.CommitMetadata;
 import org.javers.core.diff.changetype.PropertyChange;
 import org.javers.core.metamodel.object.CdoSnapshot;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +36,30 @@ public class Helper {
     }
 
     private final AuditMappedRepository auditMappedRepository;
+
+    public ResponseEntity<InputStreamResource> generateAuditReport(List<AuditMappedEntity> records) {
+        if (records == null || records.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        // Create an ASCII table and export the data
+        String tableString = exportAsText(records);
+
+        // Convert the content to an InputStream (can be a ByteArrayInputStream)
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(tableString.getBytes(StandardCharsets.UTF_8));
+
+        // Create a resource from the byte array
+        InputStreamResource resource = new InputStreamResource(byteArrayInputStream);
+
+        // Set the headers and return the file as a response
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=audit_report.txt");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(resource);
+    }
 
     public List<AuditMappedEntity> customizeAuditDetails(Changes changes, List<CdoSnapshot> snapshots) {
 
@@ -77,7 +108,7 @@ public class Helper {
         return mappedList;
     }
 
-    public void exportAsText(List<AuditMappedEntity> records) {
+    public String exportAsText(List<AuditMappedEntity> records) {
         // Create an ASCII table
         AsciiTable table = new AsciiTable();
         table.getRenderer().setCWC(new CWC_LongestWord());
@@ -116,7 +147,7 @@ public class Helper {
         } catch (IOException e) {
             throw new RuntimeException("Error writing to file", e);
         }
-        log.info("Saving to text file");
+        return tableString;
     }
 
 
