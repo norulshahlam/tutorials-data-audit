@@ -37,6 +37,4 @@ public class AuditController {
         }
         return ResponseEntity.ok(new ArrayList<>());
     }
-
-
 }
