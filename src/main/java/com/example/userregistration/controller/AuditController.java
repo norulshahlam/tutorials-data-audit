@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,21 +19,23 @@ import java.util.List;
 @Slf4j
 public class AuditController {
 
-    private Helper helper;
+    private final Helper helper;
     private final AuditMappedRepository auditMappedRepository;
 
-    public AuditController(AuditMappedRepository auditMappedRepository) {
+    public AuditController(Helper helper, AuditMappedRepository auditMappedRepository) {
+        this.helper = helper;
         this.auditMappedRepository = auditMappedRepository;
     }
+
 
     @GetMapping("/getAuditReport")
     @Operation(summary = "Get contact audit report",
             description = "This endpoint will Get all contact audit")
-    public ResponseEntity<List<AuditMappedEntity>> getAuditReport() {
+    public ResponseEntity<String> getAuditReport() {
         List<AuditMappedEntity> all = auditMappedRepository.findAll();
         if (ObjectUtils.isNotEmpty(all)) {
-            helper.exportAsText(all);
+            return ResponseEntity.ok(    helper.exportAsText(all));
         }
-        return ResponseEntity.ok(new ArrayList<>());
+        return ResponseEntity.ok("Nothing");
     }
 }
