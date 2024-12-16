@@ -1,5 +1,6 @@
 package com.example.userregistration.service;
 
+import com.example.userregistration.annotation.Auditable;
 import com.example.userregistration.entity.AuditMappedEntity;
 import com.example.userregistration.entity.ContactEntity;
 import com.example.userregistration.repository.AuditMappedRepository;
@@ -73,10 +74,10 @@ public class ContactChangeAspect {
         logChange(newContact, null, "CREATE", null, null);
     }
 
+    @Around("@annotation(auditable) && args(contact)")
     @SneakyThrows
-    @Around("execution(* com.example.userregistration.impl.ContactServiceImpl.editContact(..)) && args(contact)")
-    public void editContactPointcut(ProceedingJoinPoint joinPoint, ContactEntity contact) {
-        log.info("[BEFORE UPDATE] ID: {}", contact.getId());
+    public void handleAuditableUpdate(ProceedingJoinPoint joinPoint, Auditable auditable, ContactEntity contact) {
+        log.info("[{} BEFORE] ID: {}", auditable.action(), contact.getId());
 
         /* Get cookie */
         getServletAttributes();
@@ -101,7 +102,7 @@ public class ContactChangeAspect {
                         .version(1L)
                         .id(Math.toIntExact(updatedContact.getId()))
                         .author(getUsernameFromCookie())
-                        .type("UPDATE")
+                        .type(auditable.action())
                         .fieldName(i.getFieldName())
                         .newValue(i.getLeft().toString())
                         .oldValue(i.getRight().toString())

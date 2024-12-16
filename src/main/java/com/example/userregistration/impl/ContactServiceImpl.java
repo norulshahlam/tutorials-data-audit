@@ -1,5 +1,6 @@
 package com.example.userregistration.impl;
 
+import com.example.userregistration.annotation.Auditable;
 import com.example.userregistration.entity.ContactEntity;
 import com.example.userregistration.repository.ContactRepository;
 import com.example.userregistration.service.ContactService;
@@ -49,6 +50,7 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
+    @Auditable(action = "UPDATE")
     public ContactEntity editContact(ContactEntity contact) {
         Optional<ContactEntity> result = contactRepository.findById(contact.getId());
 
