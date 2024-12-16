@@ -32,9 +32,6 @@ spring:
       hibernate:
         format_sql: true
         ddl-auto: create
-        ejb:
-          interceptor:
-            session_scoped: com.example.userregistration.service.MyInterceptor
   output:
     ansi:
       enabled: always
@@ -48,7 +45,3 @@ spring:
     maxLifetime: 1800000
     connectionTimeout: 300000
     leakDetectionThreshold: 300000
-#logging:
-#  level:
-#    org.hibernate: DEBUG
-#    event.internal: DEBUG
