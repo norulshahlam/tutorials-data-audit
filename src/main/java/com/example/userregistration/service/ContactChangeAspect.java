@@ -12,7 +12,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -37,26 +36,10 @@ public class ContactChangeAspect {
         this.auditMappedRepository = auditMappedRepository;
     }
 
-    @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.createContact(..)) && args(contact)")
-    public void createContactPointcut(ContactEntity contact) {
-    }
-
-    @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.editContact(..)) && args(contact)")
-    public void editContactPointcut(ContactEntity contact) {
-    }
-
-    @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.deleteContact(..)) && args(id)")
-    public void deleteContactPointcut(Long id) {
-    }
-
-    @Pointcut("execution(* com.example.userregistration.impl.ContactServiceImpl.saveMultipleContacts(..)) && args(contactEntities)")
-    public void saveMultipleContactsPointcut(List<ContactEntity> contactEntities) {
-    }
-
     @SuppressWarnings("unchecked")
     @SneakyThrows
-    @Around("saveMultipleContactsPointcut(contactEntities)")
-    public void trackSaveMultipleContacts(ProceedingJoinPoint joinPoint, List<ContactEntity> contactEntities) {
+    @Around("execution(* com.example.userregistration.impl.ContactServiceImpl.saveMultipleContacts(..)) && args(contactEntities)")
+    public void saveMultipleContactsPointcut(ProceedingJoinPoint joinPoint, List<ContactEntity> contactEntities) {
         log.info("[BEFORE BULK CREATE] Attempting to create multiple contacts");
 
         /* Get cookie */
@@ -80,19 +63,19 @@ public class ContactChangeAspect {
     }
 
     @SneakyThrows
-    @Around("createContactPointcut(contact)")
-    public void trackCreateContactAround(ProceedingJoinPoint joinPoint, ContactEntity contact) {
+    @Around("execution(* com.example.userregistration.impl.ContactServiceImpl.createContact(..)) && args(contact)")
+    public void createContactPointcut(ProceedingJoinPoint joinPoint, ContactEntity contact) {
         log.info("[BEFORE CREATE]");
 
         ContactEntity newContact = (ContactEntity) joinPoint.proceed();
-        log.info("[AFTER CREATE ID: {}]",newContact.getId());
+        log.info("[AFTER CREATE ID: {}]", newContact.getId());
 
         logChange(newContact, null, "CREATE", null, null);
     }
 
     @SneakyThrows
-    @Around("editContactPointcut(contact)")
-    public void trackEditContactAround(ProceedingJoinPoint joinPoint, ContactEntity contact) {
+    @Around("execution(* com.example.userregistration.impl.ContactServiceImpl.editContact(..)) && args(contact)")
+    public void editContactPointcut(ProceedingJoinPoint joinPoint, ContactEntity contact) {
         log.info("[BEFORE UPDATE] ID: {}", contact.getId());
 
         /* Get cookie */
@@ -129,8 +112,8 @@ public class ContactChangeAspect {
     }
 
     @SneakyThrows
-    @Around("deleteContactPointcut(id)")
-    public void trackDeleteContactAround(ProceedingJoinPoint joinPoint, Long id) {
+    @Around("execution(* com.example.userregistration.impl.ContactServiceImpl.deleteContact(..)) && args(id)")
+    public void deleteContactPointcut(ProceedingJoinPoint joinPoint, Long id) {
         log.info("[BEFORE DELETE] ID: {}", id);
 
         joinPoint.proceed();
