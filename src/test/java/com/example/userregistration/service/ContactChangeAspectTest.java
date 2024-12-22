@@ -85,7 +85,7 @@ class ContactChangeAspectTest {
         when(contactRepository.findById(contactEntity.getId())).thenReturn(Optional.of(contactEntity));
 
         // When
-        contactChangeAspect.editContactPointcut(null, updatedContactEntity);
+        contactChangeAspect.handleAuditableUpdate(null, null,null);
 
         // Then
         assertEquals(update.size(), 1);
