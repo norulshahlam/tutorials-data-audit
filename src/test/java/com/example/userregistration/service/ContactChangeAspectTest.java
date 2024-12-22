@@ -68,7 +68,7 @@ class ContactChangeAspectTest {
                 .stream()
                 .map(i -> AuditMappedEntity.builder()
                         .commitDate(LocalDateTime.now())
-                        .version(1L)
+                        .sessionId(null)
                         .id(Math.toIntExact(updatedContactEntity.getId()))
                         .author("SYSTEM_USERNAME")
                         .type("UPDATE")

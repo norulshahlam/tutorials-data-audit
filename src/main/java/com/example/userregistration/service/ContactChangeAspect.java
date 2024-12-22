@@ -7,6 +7,7 @@ import com.example.userregistration.repository.AuditMappedRepository;
 import com.example.userregistration.repository.ContactRepository;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.builder.DiffResult;
 import org.apache.commons.lang3.builder.ReflectionDiffBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -52,7 +53,7 @@ public class ContactChangeAspect {
         List<AuditMappedEntity> mappedContactLists = createdContactLists.stream()
                 .map(i -> AuditMappedEntity.builder()
                         .commitDate(LocalDateTime.now())
-                        .version(1L)
+                        .sessionId(getSessionId())
                         .id(Math.toIntExact(i.getId()))
                         .author(getUsernameFromCookie())
                         .type("CREATE")
@@ -67,11 +68,13 @@ public class ContactChangeAspect {
     @Around("execution(* com.example.userregistration.impl.ContactServiceImpl.createContact(..)) && args(contact)")
     public void createContactPointcut(ProceedingJoinPoint joinPoint, ContactEntity contact) {
         log.info("[BEFORE CREATE]");
+        getServletAttributes();
 
         ContactEntity newContact = (ContactEntity) joinPoint.proceed();
         log.info("[AFTER CREATE ID: {}]", newContact.getId());
 
         logChange(newContact, null, "CREATE", null, null);
+        requestThreadLocal.remove();
     }
 
     @Around("@annotation(auditable) && args(contact)")
@@ -99,7 +102,7 @@ public class ContactChangeAspect {
                 .stream()
                 .map(i -> AuditMappedEntity.builder()
                         .commitDate(LocalDateTime.now())
-                        .version(1L)
+                        .sessionId(getSessionId())
                         .id(Math.toIntExact(updatedContact.getId()))
                         .author(getUsernameFromCookie())
                         .type(auditable.action())
@@ -116,25 +119,24 @@ public class ContactChangeAspect {
     @Around("execution(* com.example.userregistration.impl.ContactServiceImpl.deleteContact(..)) && args(id)")
     public void deleteContactPointcut(ProceedingJoinPoint joinPoint, Long id) {
         log.info("[BEFORE DELETE] ID: {}", id);
-
+        getServletAttributes();
         joinPoint.proceed();
         log.info("[AFTER DELETE] ID: {}", id);
 
         ContactEntity contact = new ContactEntity();
         contact.setId(id);
         logChange(contact, null, "DELETE", null, null);
+        requestThreadLocal.remove();
     }
 
 
     private void logChange(ContactEntity contact, String fieldName, String type, String oldValue, String newValue) {
 
-        getServletAttributes();
-
         AuditMappedEntity auditBuilder = AuditMappedEntity.builder()
                 .id(contact.getId() != null ? Math.toIntExact(contact.getId()) : null)
                 .commitId(BigDecimal.valueOf(System.currentTimeMillis()))
                 .commitDate(LocalDateTime.now())
-                .version(1L)
+                .sessionId(getSessionId())
                 .author(getUsernameFromCookie())
                 .type(type)
                 .fieldName(fieldName)
@@ -143,7 +145,6 @@ public class ContactChangeAspect {
                 .entity(contact.getClass().getSimpleName())
                 .build();
         auditMappedRepository.save(auditBuilder);
-        requestThreadLocal.remove();
     }
 
     private static void getServletAttributes() {
@@ -174,5 +175,13 @@ public class ContactChangeAspect {
             }
         }
         return "SYSTEM_USERNAME";
+    }
+
+    private String getSessionId() {
+        Object sessionId = requestThreadLocal.get().getAttribute("sessionId");
+        if (ObjectUtils.isNotEmpty(sessionId)) {
+            return String.valueOf(sessionId);
+        }
+        return "UNKNOWN_SESSION_ID";
     }
 }

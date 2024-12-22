@@ -25,7 +25,7 @@ public class AuditMappedEntity {
     private Integer id;
     private BigDecimal commitId;
     private LocalDateTime commitDate;
-    private Long version;
+    private String sessionId;
     private String author;
     private String type;
     private String fieldName;

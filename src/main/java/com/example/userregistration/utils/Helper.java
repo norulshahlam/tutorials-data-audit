@@ -70,7 +70,7 @@ public class Helper {
                     record.getId() != null ? record.getId() : "",
                     record.getCommitId() != null ? record.getCommitId() : "",
                     record.getCommitDate() != null ? record.getCommitDate() : "",
-                    record.getVersion() != null ? record.getVersion() : "",
+                    record.getSessionId() != null ? record.getSessionId() : "",
                     record.getAuthor() != null ? record.getAuthor() : "",
                     record.getType() != null ? record.getType() : "",
                     record.getFieldName() != null ? record.getFieldName() : "",
