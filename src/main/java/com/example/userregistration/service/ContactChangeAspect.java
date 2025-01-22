@@ -178,7 +178,7 @@ public class ContactChangeAspect {
     }
 
     private String getSessionId() {
-        Object sessionId = requestThreadLocal.get().getAttribute("sessionId");
+        Object sessionId = requestThreadLocal.get().getAttribute("requestId");
         if (ObjectUtils.isNotEmpty(sessionId)) {
             return String.valueOf(sessionId);
         }
