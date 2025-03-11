@@ -8,12 +8,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 
@@ -32,7 +28,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("api/v1")
 @Tag(name = "Booking module")
-
 @ApiResponses(value = {
         @ApiResponse(responseCode = "400", description = "Bad Request",
                 content = @Content),
@@ -48,7 +43,6 @@ import java.util.List;
                 content = @Content),
         @ApiResponse(responseCode = "503", description = "Service Unavailable",
                 content = @Content)})
-
 public class BookingController {
 
     private final BookingService service;
@@ -99,12 +93,13 @@ public class BookingController {
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.deleteBooking(id));
     }
+
     @Tag(name = "contacts")
-    @ApiResponse(responseCode = "200", description = "Contact created",
+    @ApiResponse(responseCode = "200", description = "contact created",
             content = @Content(mediaType = "application/json"))
-    @Operation(summary = "Create new contact",
-            description = "This endpoint will Create new contact based on the given input data",
-            security = {@SecurityRequirement(name = "cookieAuth")}) // Reference global security scheme
+    @Operation(summary = "Create new contact", parameters = {
+            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "shah")
+    }, description = "This endpoint will Create new contact based on the given input data")
     @PostMapping("createContact")
     public ResponseEntity<ContactEntity> createContact(@Valid @RequestBody @NotBlank ContactEntity request) {
 
@@ -114,17 +109,31 @@ public class BookingController {
     }
 
     @Tag(name = "contacts")
+    @ApiResponse(responseCode = "200", description = "Contact fetched",
+            content = @Content(mediaType = "application/json"))
+    @Operation(summary = "Fetch Contact",
+            description = "This endpoint will Fetch Contact based on id")
+    @GetMapping("fetchContact/{id}")
+    public ResponseEntity<ContactEntity> fetchContact(@PathVariable Long id) {
+
+        log.info("in BookingController::fetchContact");
+        ContactEntity booking = contactService.fetchContact(id);
+        return ResponseEntity.status(HttpStatus.OK).body(booking);
+    }
+
+    @Tag(name = "contacts")
     @ApiResponse(responseCode = "200", description = "Contact Edited",
             content = @Content(mediaType = "application/json"))
-    @Operation(summary = "Edit existing contact",
-            description = "This endpoint will Edit existing contact",
-            security = {@SecurityRequirement(name = "cookieAuth")}) // Reference global security scheme
+    @Operation(summary = "Edit existing contact", parameters = {
+            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "shah")
+    },
+            description = "This endpoint will Edit existing contact")
     @PostMapping("editContact")
     public ResponseEntity<ContactEntity> editContact(@Valid @RequestBody @NotBlank ContactEntity request) {
         log.info("in BookingController::editContact");
+
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(contactService.editContact(request));
     }
-
 
     @Tag(name = "contacts")
     @ApiResponse(responseCode = "200", description = "Contact deleted",
@@ -142,10 +151,10 @@ public class BookingController {
     @ApiResponse(responseCode = "200", description = "contact created",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Create list of contacts", parameters = {
-            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, content = @Content(mediaType = "application/json"))
+            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "shah")
     }, description = "This endpoint will Create list of contacts based on the given input data")
     @PostMapping("saveMultipleContacts")
-    public ResponseEntity<List<ContactEntity>> saveMultipleContacts(@Valid @RequestBody @NotEmpty         @ArraySchema(schema = @Schema(implementation = ContactEntity.class)) List<ContactEntity> request) {
+    public ResponseEntity<List<ContactEntity>> saveMultipleContacts(@Valid @RequestBody @NotBlank List<ContactEntity> request) {
 
         log.info("in BookingController::saveMultipleContacts");
         List<ContactEntity> contactEntityList = contactService.saveMultipleContacts(request);
