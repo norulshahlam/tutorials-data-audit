@@ -1,9 +1,12 @@
 package com.example.userregistration.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +23,15 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(getInfo(properties)
                         .contact(getContact()))
-                .servers(List.of(getServer1(), getServer2()));
+                .servers(List.of(getServer1(), getServer2()))
+                .components(new Components()
+                        .addSecuritySchemes("cookieAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.APIKEY)
+                                        .in(SecurityScheme.In.COOKIE)
+                                        .name("username") // Cookie name
+                        ))
+                .addSecurityItem(new SecurityRequirement().addList("cookieAuth"));
     }
 
     private Server getServer1() {
