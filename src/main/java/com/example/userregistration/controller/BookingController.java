@@ -8,7 +8,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 
@@ -139,10 +142,10 @@ public class BookingController {
     @ApiResponse(responseCode = "200", description = "contact created",
             content = @Content(mediaType = "application/json"))
     @Operation(summary = "Create list of contacts", parameters = {
-            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, example = "shah", content = @Content(mediaType = "application/json"))
+            @Parameter(in = ParameterIn.COOKIE, name = "username", required = true, content = @Content(mediaType = "application/json"))
     }, description = "This endpoint will Create list of contacts based on the given input data")
     @PostMapping("saveMultipleContacts")
-    public ResponseEntity<List<ContactEntity>> saveMultipleContacts(@Valid @RequestBody @NotBlank List<ContactEntity> request) {
+    public ResponseEntity<List<ContactEntity>> saveMultipleContacts(@Valid @RequestBody @NotEmpty         @ArraySchema(schema = @Schema(implementation = ContactEntity.class)) List<ContactEntity> request) {
 
         log.info("in BookingController::saveMultipleContacts");
         List<ContactEntity> contactEntityList = contactService.saveMultipleContacts(request);

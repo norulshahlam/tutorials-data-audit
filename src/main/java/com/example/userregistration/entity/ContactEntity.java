@@ -23,25 +23,26 @@ public class ContactEntity implements Serializable {
 
     @Id
     @Column(name = "ID")
+    @Schema(description = "Unique identifier of the contact", example = "1")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @DiffExclude
     private Long id;
 
-    @Schema(
+    @Schema(description = "Name of the contact",
             format = "string",
             example = "John Doe",
             requiredMode = Schema.RequiredMode.REQUIRED)
     @Column(name = "NAME")
     private String name;
 
-    @Schema(
+    @Schema(description = "Email of the contact",
             format = "email"
            )
     @Column(name = "EMAIL")
     @Email
     private String email;
 
-    @Schema(
+    @Schema(description = "Mobile number of the contact",
             format = "string",
             example = "+65-92212152",
             requiredMode = Schema.RequiredMode.REQUIRED)
