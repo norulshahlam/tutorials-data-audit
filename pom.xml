@@ -131,32 +131,30 @@
 <!--                    </execution>-->
 <!--                </executions>-->
 <!--            </plugin>-->
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.12.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-openapi-docs</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <generatorName>spring</generatorName>
-                            <!-- Use the complete URL of the OpenAPI documentation -->
-                            <inputSpec>http://localhost:8080/v3/api-docs.yaml</inputSpec> <!-- Ensure this URL is correct -->
-                            <output>${project.build.directory}</output>
-                            <outputFileName>api-docs.yaml</outputFileName>
-                            <apiPackage>com.example.userregistration</apiPackage>
-                            <modelPackage>com.example.userregistration</modelPackage>
-                            <generateApiDocumentation>true</generateApiDocumentation>
-                            <enablePostProcessFile>true</enablePostProcessFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+                <plugin>
+                    <groupId>org.openapitools</groupId>
+                    <artifactId>openapi-generator-maven-plugin</artifactId>
+                    <version>6.0.1</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                            <configuration>
+                                <verbose>true</verbose>
+                                <inputSpec>${project.basedir}/src/main/resources/api-docs.yaml</inputSpec>
+                                <generatorName>spring</generatorName>
+                                <output>${project.build.directory}/generated-sources/openapi</output>
+                                <modelPackage>com.example.api.model</modelPackage>
+                                <apiPackage>com.example.api.api</apiPackage>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
 
-        </plugins>
+
+
     </build>
 
 </project>

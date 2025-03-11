@@ -17,6 +17,7 @@ import java.io.Serializable;
 @Builder
 @Entity
 @Table(name = "CONTACT")
+@Schema(description = "Contact entity")
 public class ContactEntity implements Serializable {
 
     public static final long serialVersionId = 1L;
