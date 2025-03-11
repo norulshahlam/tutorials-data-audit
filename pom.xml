@@ -113,9 +113,28 @@
                     </excludes>
                 </configuration>
             </plugin>
+
+<!--            <plugin>-->
+<!--                <groupId>org.springdoc</groupId>-->
+<!--                <artifactId>springdoc-openapi-maven-plugin</artifactId>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>generate-openapi-docs</id>-->
+<!--                        <goals>-->
+<!--                            <goal>generate</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <outputFileName>\api-docs.yaml</outputFileName>-->
+<!--                            <outputFormat>yaml</outputFormat>-->
+<!--                            <fork>true</fork>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
             <plugin>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-maven-plugin</artifactId>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.5.0</version>
                 <executions>
                     <execution>
                         <id>generate-openapi-docs</id>
@@ -123,14 +142,18 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <outputFileName>\api-docs.yaml</outputFileName>
-                            <outputFormat>yaml</outputFormat>
-                            <fork>true</fork>
+                            <generatorName>spring</generatorName>
+                            <!-- Use the complete URL of the OpenAPI documentation -->
+                            <inputSpec>http://localhost:8080/v3/api-docs.yaml</inputSpec> <!-- Ensure this URL is correct -->
+                            <output>${project.build.directory}</output>
+                            <outputFileName>api-docs.yaml</outputFileName>
+                            <apiPackage>com.example.userregistration.controller</apiPackage>
+                            <modelPackage>com.example.userregistration.model</modelPackage>
+                            <generateApiDocumentation>true</generateApiDocumentation>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
 
         </plugins>
     </build>

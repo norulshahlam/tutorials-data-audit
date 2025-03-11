@@ -43,6 +43,7 @@ public class BookingEntity implements Serializable {
     private String bkgNo;
 
 
+    @Schema
     @Builder.Default
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "bookingId", referencedColumnName = "id")

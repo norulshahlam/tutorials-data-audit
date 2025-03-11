@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.DiffExclude;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.io.Serializable;
 
 @Data
@@ -33,7 +34,11 @@ public class ContactEntity implements Serializable {
     @Column(name = "NAME")
     private String name;
 
+    @Schema(
+            format = "email"
+           )
     @Column(name = "EMAIL")
+    @Email
     private String email;
 
     @Schema(
