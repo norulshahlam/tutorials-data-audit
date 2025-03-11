@@ -147,9 +147,10 @@
                             <inputSpec>http://localhost:8080/v3/api-docs.yaml</inputSpec> <!-- Ensure this URL is correct -->
                             <output>${project.build.directory}</output>
                             <outputFileName>api-docs.yaml</outputFileName>
-                            <apiPackage>com.example.userregistration.controller</apiPackage>
-                            <modelPackage>com.example.userregistration.model</modelPackage>
+                            <apiPackage>com.example.userregistration</apiPackage>
+                            <modelPackage>com.example.userregistration</modelPackage>
                             <generateApiDocumentation>true</generateApiDocumentation>
+                            <enablePostProcessFile>true</enablePostProcessFile>
                         </configuration>
                     </execution>
                 </executions>
