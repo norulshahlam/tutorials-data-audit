@@ -89,7 +89,7 @@ public class Helper {
         String path = "C:/Users/NORUL/Documents/GitHub/tutorials-data-audit/src/main/resources/data.txt";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             writer.write(tableString);
-            log.info("File successfully written to: " + path);
+            log.info("File successfully written to: {}", path);
         } catch (IOException e) {
             throw new RuntimeException("Error writing to file", e);
         }

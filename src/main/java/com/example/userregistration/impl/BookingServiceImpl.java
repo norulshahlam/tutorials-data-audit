@@ -37,7 +37,7 @@ public class BookingServiceImpl implements BookingService {
         Optional<BookingEntity> bookingEntity = bookingRepository.findById(id);
 
         if (bookingEntity.isPresent()) {
-            log.info("bookingEntity: " + objectMapper.writeValueAsString(bookingEntity.get()));
+            log.info("bookingEntity: {}", objectMapper.writeValueAsString(bookingEntity.get()));
             return bookingEntity.get();
         }
         throw new NoResultException("Booking to be fetched not found");
@@ -55,7 +55,7 @@ public class BookingServiceImpl implements BookingService {
             updatedToEntity(booking, bookingEntity);
 
             BookingEntity saved = bookingRepository.save(bookingEntity);
-            log.info("saved: " + saved);
+            log.info("saved: {}", saved);
             return saved;
         }
         throw new NoResultException("Booking to be edited not found");
