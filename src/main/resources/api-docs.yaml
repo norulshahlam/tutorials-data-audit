@@ -1,0 +1,137 @@
+openapi: 3.0.1
+info:
+  title: MyPIL
+  description: User registration module
+  contact:
+    name: Infosys
+    url: https://www.infosys.com/
+    email: norulshahlam.mohsen@infosys.com
+  license:
+    name: Licensed under Infosys
+    url: https://www.lawinsider.com/dictionary/infosys-technologies-agreement
+  version: v1
+servers:
+  - url: http://localhost:8080
+    description: localhost
+  - url: http://localhost:8082
+    description: uat
+security:
+  - cookieAuth: []
+tags:
+  - name: "Booking module"
+    description: "Handles operations related to bookings"
+  - name: "contacts"
+    description: "Handles operations related to contacts"
+  - name: "audit-controller"
+    description: "Handles audit-related operations"
+paths:
+  /api/v1/saveMultipleContacts:
+    post:
+      tags:
+        - Booking module
+        - contacts
+      summary: "Create list of contacts"
+      description: "This endpoint will create a list of contacts based on the given input data"
+      operationId: saveMultipleContacts
+      parameters:
+        - name: username
+          in: cookie
+          required: true
+          content:
+            application/json: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContactEntity'
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+        "405":
+          description: Method not Allowed
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+        "401":
+          description: Unauthorized Access
+        "200":
+          description: Contact created
+        "404":
+          description: Not Found
+        "403":
+          description: Forbidden
+  /api/v1/editContact:
+    post:
+      tags:
+        - Booking module
+        - contacts
+      summary: "Edit existing contact"
+      description: "This endpoint will edit an existing contact"
+      operationId: editContact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactEntity'
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+        "405":
+          description: Method not Allowed
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Service Unavailable
+        "401":
+          description: Unauthorized Access
+        "200":
+          description: Contact Edited
+        "404":
+          description: Not Found
+        "403":
+          description: Forbidden
+  # Continue with other paths...
+components:
+  schemas:
+    ContactEntity:
+      required:
+        - mobileNo
+        - name
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the contact
+          format: int64
+        name:
+          type: string
+          description: Name of the contact
+        email:
+          type: string
+          description: Email of the contact
+        mobileNo:
+          type: string
+          description: Mobile number of the contact
+    BookingEntity:
+      required:
+        - bkgRqstNo
+      type: object
+      properties:
+        id:
+          type: integer
+        bkgRqstNo:
+          type: string
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactEntity'
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      name: username
+      in: cookie
